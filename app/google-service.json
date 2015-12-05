@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "corsanum-24ffe",
+    "project_number": "823708477306",
+    "name": "CorSanum"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823708477306:android:660d2f55030b689e",
+        "client_id": "android:lu.uni.psod.corsanum",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "lu.uni.psod.corsanum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823708477306-c9qmt1asm4nugek6phriht31kkdk0jgn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lu.uni.psod.corsanum",
+            "certificate_hash": "1EE7ED2B8E011020430CCBB0FB49B43865318A84"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
