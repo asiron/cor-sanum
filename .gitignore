@@ -6,3 +6,5 @@
 /build
 /captures
 app/google-services.json
+.idea
+cor-sanum.iml
