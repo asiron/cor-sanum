@@ -9,6 +9,8 @@ public class Action {
     private Position mEndPos;
 
     private double mExpectedDuration;
+    private ActionType mActionType;
+
 
     public Position getStartPos() {
         return mStartPos;
@@ -32,5 +34,13 @@ public class Action {
 
     public void setExpectedDuration(double dur) {
         this.mExpectedDuration = dur;
+    }
+
+    public ActionType getActionType() {
+        return mActionType;
+    }
+
+    public void setActionType(ActionType actionType) {
+        this.mActionType = actionType;
     }
 }
