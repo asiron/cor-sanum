@@ -19,6 +19,7 @@ import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.daimajia.swipe.implments.SwipeItemRecyclerMangerImpl;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -33,6 +34,8 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
         TextView textViewPos;
         TextView textViewData;
         Button buttonDelete;
+
+        boolean canEnter;
 
 
         public SimpleViewHolder(View itemView) {
@@ -49,15 +52,17 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
                     Toast.makeText(view.getContext(), "onItemSelected: " + textViewData.getText().toString(), Toast.LENGTH_SHORT).show();
                 }
             });
+
+            canEnter = true;
         }
     }
 
     private Context mContext;
-    private ArrayList<String> mDataset;
+    private ArrayList<Exercise> mDataset;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
-    public RecyclerViewAdapter(Context context, ArrayList<String> objects) {
+    public RecyclerViewAdapter(Context context, ArrayList<Exercise> objects) {
         this.mContext = context;
         this.mDataset = objects;
     }
@@ -70,23 +75,54 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder viewHolder, final int position) {
-        final String item = mDataset.get(position);
+        final String exerciseName = mDataset.get(position).getExerciseName();
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {
                 YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
+                Log.i("AAA", "open");
+                Log.i("JSON", (new Gson()).toJson(mDataset));
             }
+
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                Log.i("AAA", "update");
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+                Log.i("AAA", "hand release");
+            }
+
+            @Override
+            public void onStartOpen(SwipeLayout layout) {
+                Log.i("AAA", "start open");
+                viewHolder.canEnter = false;
+            }
+
+            @Override
+            public void onStartClose(SwipeLayout layout) {
+                Log.i("AAA", "start close");
+            }
+
+            @Override
+            public void onClose(SwipeLayout layout) {
+                Log.i("AAA", "close");
+                viewHolder.canEnter = true;
+            }
+
         });
         viewHolder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(mContext, viewHolder.textViewData.getText().toString() + " clicked!", Toast.LENGTH_SHORT).show();
+                if (viewHolder.canEnter == false)
+                    return;
+
                 Intent intent = new Intent(mContext, ExerciseActivity.class);
-// Pass data object in the bundle and populate details activity.
-                intent.putExtra("title", item);
+                intent.putExtra("title", exerciseName);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation((Activity)mContext, (View)viewHolder.textViewData, "exc_name");
+                        makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
                 mContext.startActivity(intent, options.toBundle());
             }
         });
@@ -108,7 +144,7 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
             }
         });
         viewHolder.textViewPos.setText((position + 1) + ".");
-        viewHolder.textViewData.setText(item);
+        viewHolder.textViewData.setText(exerciseName);
         mItemManger.bindView(viewHolder.itemView, position);
     }
 

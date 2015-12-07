@@ -13,6 +13,10 @@ import android.view.MenuItem;
 
 import com.daimajia.swipe.util.Attributes;
 
+import lu.uni.psod.corsanum.models.Action;
+import lu.uni.psod.corsanum.models.ActionType;
+import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.Position;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
 import lu.uni.psod.corsanum.utils.RecyclerViewAdapter;
 
@@ -20,6 +24,7 @@ import lu.uni.psod.corsanum.utils.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 
@@ -51,6 +56,29 @@ public class MyExercises extends Activity {
             }
         }
 
+        ArrayList<Exercise> exerciseList = new ArrayList<Exercise>();
+
+        Exercise ex1 = new Exercise("Long run in Park");
+        ex1.getActions().add(new Action(new Position(0,0), new Position(1,1), 0.0, ActionType.RUN));
+        ex1.getActions().add(new Action(new Position(1,1), new Position(2,2), 0.0, ActionType.WALK_FAST));
+        ex1.getActions().add(new Action(new Position(2,2), new Position(2,2), 2.0, ActionType.STRETCH));
+
+        Exercise ex2 = new Exercise("Stretching session");
+        ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+        ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+        ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+
+        Exercise ex3 = new Exercise("Sprinting");
+        ex3.getActions().add(new Action(new Position(0,0), new Position(2,2), 0.0, ActionType.RUN));
+        ex3.getActions().add(new Action(new Position(2,2), new Position(4,4), 0.0, ActionType.RUN_FAST));
+        ex3.getActions().add(new Action(new Position(4,4), new Position(6,6.5), 0.0, ActionType.RUN));
+        ex3.getActions().add(new Action(new Position(6,6.5), new Position(9,9), 0.0, ActionType.RUN_FAST));
+        ex3.getActions().add(new Action(new Position(9,9), new Position(9,9), 10.0, ActionType.STRETCH));
+
+        exerciseList.add(ex1);
+        exerciseList.add(ex2);
+        exerciseList.add(ex3);
+
         // Layout Managers:
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -59,9 +87,7 @@ public class MyExercises extends Activity {
         recyclerView.setItemAnimator(new FadeInLeftAnimator());
 
         // Adapter:
-        String[] adapterData = new String[]{"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"};
-        mDataSet = new ArrayList<String>(Arrays.asList(adapterData));
-        mAdapter = new RecyclerViewAdapter(this, mDataSet);
+        mAdapter = new RecyclerViewAdapter(this, exerciseList);
         ((RecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
 

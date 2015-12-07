@@ -11,6 +11,16 @@ public class Action {
     private double mExpectedDuration;
     private ActionType mActionType;
 
+    public Action() {
+
+    }
+
+    public Action(Position mEndPos, Position mStartPos, double mExpectedDuration, ActionType mActionType) {
+        this.mEndPos = mEndPos;
+        this.mStartPos = mStartPos;
+        this.mExpectedDuration = mExpectedDuration;
+        this.mActionType = mActionType;
+    }
 
     public Position getStartPos() {
         return mStartPos;
