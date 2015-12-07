@@ -1,5 +1,6 @@
 package lu.uni.psod.corsanum.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +11,12 @@ public class Exercise {
     private String mExerciseName;
     private List<Action> mActions;
 
+    public Exercise() {
+        this("");
+    }
+
     public Exercise(String mExerciseName) {
+        this.mActions = new ArrayList<Action>();
         this.mExerciseName = mExerciseName;
     }
 
