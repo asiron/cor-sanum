@@ -30,6 +30,6 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:1.0.3@aar'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.google.code.gson:gson:2.2.4'
-
+    compile 'com.google.android.gms:play-services-maps:8.3.0'
 
 }

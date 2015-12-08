@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-import lu.uni.psod.corsanum.ExerciseActivity;
+import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.Exercise;
 
@@ -119,7 +119,7 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
                 if (viewHolder.canEnter == false)
                     return;
 
-                Intent intent = new Intent(mContext, ExerciseActivity.class);
+                Intent intent = new Intent(mContext, ExerciseDetailActivity.class);
                 intent.putExtra("title", exerciseName);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
