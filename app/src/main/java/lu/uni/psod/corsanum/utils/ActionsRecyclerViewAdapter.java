@@ -25,25 +25,31 @@ import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
+import lu.uni.psod.corsanum.models.Action;
 import lu.uni.psod.corsanum.models.Exercise;
 
-public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapter.SimpleViewHolder> {
+public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecyclerViewAdapter.SimpleViewHolder> {
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
         SwipeLayout swipeLayout;
         TextView textViewPos;
         TextView textViewData;
         Button buttonDelete;
+        Button buttonEdit;
 
         boolean canEnter;
 
 
         public SimpleViewHolder(View itemView) {
             super(itemView);
-            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
-            textViewPos = (TextView) itemView.findViewById(R.id.position);
-            textViewData = (TextView) itemView.findViewById(R.id.text_data);
-            buttonDelete = (Button) itemView.findViewById(R.id.delete);
+            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.actions_swipe_layout);
+            textViewPos = (TextView) itemView.findViewById(R.id.action_position);
+            textViewData = (TextView) itemView.findViewById(R.id.action_title);
+            buttonDelete = (Button) itemView.findViewById(R.id.delete_action);
+            buttonEdit   = (Button) itemView.findViewById(R.id.edit_action);
+
+            if (swipeLayout == null)
+                Log.i("B", "URWA");
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -58,29 +64,29 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
     }
 
     private Context mContext;
-    private ArrayList<Exercise> mDataset;
+    private ArrayList<Action> mDataset;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
-    public RecyclerViewAdapter(Context context, ArrayList<Exercise> objects) {
+    public ActionsRecyclerViewAdapter(Context context, ArrayList<Action> objects) {
         this.mContext = context;
         this.mDataset = objects;
     }
 
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actions_recyclerview_item, parent, false);
         return new SimpleViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder viewHolder, final int position) {
-        final String exerciseName = mDataset.get(position).getExerciseName();
+        final String exerciseName = mDataset.get(position).getActionType().toString();
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {
-                YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
+                //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
                 Log.i("AAA", "open");
                 Log.i("JSON", (new Gson()).toJson(mDataset));
             }
@@ -118,12 +124,13 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
             public void onClick(View v) {
                 if (viewHolder.canEnter == false)
                     return;
-
+                /*
                 Intent intent = new Intent(mContext, ExerciseDetailActivity.class);
                 intent.putExtra("title", exerciseName);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
                 mContext.startActivity(intent, options.toBundle());
+                */
             }
         });
         viewHolder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
@@ -143,6 +150,14 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
                 Toast.makeText(view.getContext(), "Deleted " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
+        viewHolder.buttonEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Toast.makeText(view.getContext(), "Trying to edit " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
+
+            }
+        });
         viewHolder.textViewPos.setText((position + 1) + ".");
         viewHolder.textViewData.setText(exerciseName);
         mItemManger.bindView(viewHolder.itemView, position);
@@ -155,6 +170,6 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
+        return R.id.actions_swipe_layout;
     }
 }

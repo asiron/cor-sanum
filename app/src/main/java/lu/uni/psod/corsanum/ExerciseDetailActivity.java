@@ -23,7 +23,7 @@ public class ExerciseDetailActivity extends FragmentActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise_detail);
 
-        String title = getIntent().getStringExtra("title");
+       // String title = getIntent().getStringExtra("title");
 
         ExerciseDetailHeaderFragment headerFragment =
                 (ExerciseDetailHeaderFragment) getFragmentManager()
