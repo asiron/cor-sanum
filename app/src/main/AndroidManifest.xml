@@ -22,13 +22,12 @@
             android:value="AIzaSyCizR2VMFhBDMCZ-YM6LHTguhMCBTUu3vM"/>
 
         <activity android:name=".LoginActivity" >
-        </activity>
-        <activity android:name=".MyExercises" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MyExercises" >
         </activity>
         <activity android:name=".ExerciseDetailActivity" >
         </activity>

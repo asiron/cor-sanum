@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 
-public class ExerciseDetailActivity extends FragmentActivity implements OnMapReadyCallback{
+public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCallback{
 
     TextView tv = null;
 
@@ -22,8 +22,6 @@ public class ExerciseDetailActivity extends FragmentActivity implements OnMapRea
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise_detail);
-
-       // String title = getIntent().getStringExtra("title");
 
         ExerciseDetailHeaderFragment headerFragment =
                 (ExerciseDetailHeaderFragment) getFragmentManager()
@@ -42,5 +40,9 @@ public class ExerciseDetailActivity extends FragmentActivity implements OnMapRea
         map.addMarker(new MarkerOptions()
                 .position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    public void initMap() {
+
     }
 }

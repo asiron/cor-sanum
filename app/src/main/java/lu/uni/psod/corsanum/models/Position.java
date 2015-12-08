@@ -1,11 +1,17 @@
 package lu.uni.psod.corsanum.models;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by asiron on 12/6/15.
  */
 public class Position {
 
+
+    @SerializedName("longitude")
     private double mLongitude;
+
+    @SerializedName("latitude")
     private double mLatitude;
 
     public Position() {

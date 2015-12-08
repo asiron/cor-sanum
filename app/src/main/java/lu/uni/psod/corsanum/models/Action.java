@@ -1,14 +1,22 @@
 package lu.uni.psod.corsanum.models;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by asiron on 12/6/15.
  */
 public class Action {
 
+    @SerializedName("start_pos")
     private Position mStartPos;
+
+    @SerializedName("end_pos")
     private Position mEndPos;
 
+    @SerializedName("expected_dur")
     private double mExpectedDuration;
+
+    @SerializedName("action_type")
     private ActionType mActionType;
 
     public Action() {
