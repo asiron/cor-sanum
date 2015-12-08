@@ -9,7 +9,7 @@ import java.util.List;
 public class Exercise {
 
     private String mExerciseName;
-    private List<Action> mActions;
+    private ArrayList<Action> mActions;
 
     public Exercise() {
         this("");
@@ -20,7 +20,7 @@ public class Exercise {
         this.mExerciseName = mExerciseName;
     }
 
-    public List<Action> getActions() {
+    public ArrayList<Action> getActions() {
         return mActions;
     }
 

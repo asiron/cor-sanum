@@ -2,13 +2,11 @@ package lu.uni.psod.corsanum;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.daimajia.swipe.util.Attributes;
@@ -18,13 +16,11 @@ import lu.uni.psod.corsanum.models.ActionType;
 import lu.uni.psod.corsanum.models.Exercise;
 import lu.uni.psod.corsanum.models.Position;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
-import lu.uni.psod.corsanum.utils.RecyclerViewAdapter;
+import lu.uni.psod.corsanum.utils.ExercisesRecyclerViewAdapter;
 
 //import com.daimajia.swipedemo.adapter.util.DividerItemDecoration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 
@@ -49,12 +45,7 @@ public class MyExercises extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recyclerview);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle("RecyclerView");
-            }
-        }
+
 
         ArrayList<Exercise> exerciseList = new ArrayList<Exercise>();
 
@@ -87,8 +78,8 @@ public class MyExercises extends Activity {
         recyclerView.setItemAnimator(new FadeInLeftAnimator());
 
         // Adapter:
-        mAdapter = new RecyclerViewAdapter(this, exerciseList);
-        ((RecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
+        mAdapter = new ExercisesRecyclerViewAdapter(this, exerciseList);
+        ((ExercisesRecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
 
         /* Listeners */
