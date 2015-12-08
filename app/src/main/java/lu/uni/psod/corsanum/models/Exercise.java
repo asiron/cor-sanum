@@ -1,5 +1,7 @@
 package lu.uni.psod.corsanum.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,10 @@ import java.util.List;
  */
 public class Exercise {
 
+    @SerializedName("name")
     private String mExerciseName;
+
+    @SerializedName("actions")
     private ArrayList<Action> mActions;
 
     public Exercise() {

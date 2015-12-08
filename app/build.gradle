@@ -24,7 +24,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21+'
-    
+
     compile 'com.google.android.gms:play-services:8.3.+'
 
     compile "com.daimajia.swipelayout:library:1.2.0@aar"

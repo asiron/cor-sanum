@@ -18,12 +18,15 @@ package lu.uni.psod.corsanum;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -43,8 +46,15 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
+import lu.uni.psod.corsanum.models.Action;
+import lu.uni.psod.corsanum.models.ActionType;
+import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.Position;
 
 
 /**
@@ -56,6 +66,9 @@ public class LoginActivity extends Activity {
     public static final String TAG = "BasicSensorsApi";
     // [START auth_variable_references]
     private static final int REQUEST_OAUTH = 1;
+
+    private Button created_shared;
+    private Button exercises_button;
 
     /**
      *  Track whether an authorization activity is stacking over the current activity, i.e. when
@@ -90,6 +103,53 @@ public class LoginActivity extends Activity {
         if (savedInstanceState != null) {
             authInProgress = savedInstanceState.getBoolean(AUTH_PENDING);
         }
+
+        exercises_button = (Button) findViewById(R.id.exe);
+        exercises_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(LoginActivity.this, MyExercises.class);
+                startActivity(it);
+            }
+        });
+
+        created_shared = (Button) findViewById(R.id.shared_btn);
+        created_shared.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<Exercise> exerciseList = new ArrayList<Exercise>();
+
+                Exercise ex1 = new Exercise("Long run in Park");
+                ex1.getActions().add(new Action(new Position(49.628025, 6.159010), new Position(49.632136, 6.150895), 0.0, ActionType.RUN));
+                ex1.getActions().add(new Action(new Position(49.632136, 6.150895), new Position(49.627945, 6.142899), 0.0, ActionType.WALK_FAST));
+                ex1.getActions().add(new Action(new Position(49.627945, 6.142899), new Position(49.627945, 6.142899), 2.0, ActionType.STRETCH));
+
+                Exercise ex2 = new Exercise("Stretching session");
+                ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+                ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+                ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));
+
+                Exercise ex3 = new Exercise("Sprinting");
+                ex3.getActions().add(new Action(new Position(0,0), new Position(2,2), 0.0, ActionType.RUN));
+                ex3.getActions().add(new Action(new Position(2,2), new Position(4,4), 0.0, ActionType.RUN_FAST));
+                ex3.getActions().add(new Action(new Position(4,4), new Position(6,6.5), 0.0, ActionType.RUN));
+                ex3.getActions().add(new Action(new Position(6,6.5), new Position(9,9), 0.0, ActionType.RUN_FAST));
+                ex3.getActions().add(new Action(new Position(9, 9), new Position(9, 9), 10.0, ActionType.STRETCH));
+
+                exerciseList.add(ex1);
+                exerciseList.add(ex2);
+                exerciseList.add(ex3);
+
+                Gson gson = new Gson();
+                String exercise_list_json = gson.toJson(exerciseList);
+
+                SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(getString(R.string.saved_exercise_list), exercise_list_json);
+
+                editor.commit();
+            }
+        });
 
         buildFitnessClient();
     }
