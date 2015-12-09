@@ -60,7 +60,7 @@
                 android:id="@+id/text_data"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:transitionName="exc_name"
+                android:transitionName="@string/exc_detail_tran_name"
                 android:tag="Hover"/>
         </LinearLayout>
     </com.daimajia.swipe.SwipeLayout>

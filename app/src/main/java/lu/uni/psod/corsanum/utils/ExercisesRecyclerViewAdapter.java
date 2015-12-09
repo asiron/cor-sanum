@@ -45,6 +45,7 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
             textViewData = (TextView) itemView.findViewById(R.id.text_data);
             buttonDelete = (Button) itemView.findViewById(R.id.delete);
 
+            /*
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -52,7 +53,7 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
                     Toast.makeText(view.getContext(), "onItemSelected: " + textViewData.getText().toString(), Toast.LENGTH_SHORT).show();
                 }
             });
-
+            */
             canEnter = true;
         }
     }
@@ -65,6 +66,10 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
     public ExercisesRecyclerViewAdapter(Context context, ArrayList<Exercise> objects) {
         this.mContext = context;
         this.mDataset = objects;
+    }
+
+    public void updateDataset(ArrayList<Exercise> mDataset) {
+        this.mDataset = mDataset;
     }
 
     @Override
@@ -81,37 +86,33 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
             @Override
             public void onOpen(SwipeLayout layout) {
                 YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
-                Log.i("AAA", "open");
-                Log.i("JSON", (new Gson()).toJson(mDataset));
-            }
-
-            @Override
-            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                Log.i("AAA", "update");
-            }
-
-            @Override
-            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                Log.i("AAA", "hand release");
             }
 
             @Override
             public void onStartOpen(SwipeLayout layout) {
-                Log.i("AAA", "start open");
                 viewHolder.canEnter = false;
+            }
+
+            @Override
+            public void onClose(SwipeLayout layout) {
+                viewHolder.canEnter = true;
+            }
+
+            /*
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
             }
 
             @Override
             public void onStartClose(SwipeLayout layout) {
                 Log.i("AAA", "start close");
             }
-
-            @Override
-            public void onClose(SwipeLayout layout) {
-                Log.i("AAA", "close");
-                viewHolder.canEnter = true;
-            }
-
+            */
         });
         viewHolder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,17 +122,25 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
                 Intent intent = new Intent(mContext, ExerciseDetailActivity.class);
                 intent.putExtra(mContext.getString(R.string.current_exercise_idx), position);
+
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
+                        makeSceneTransitionAnimation(
+                                (Activity) mContext,
+                                (View) viewHolder.textViewData,
+                                mContext.getString(R.string.exc_detail_tran_name)
+                        );
+
                 mContext.startActivity(intent, options.toBundle());
             }
         });
+
         viewHolder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
             @Override
             public void onDoubleClick(SwipeLayout layout, boolean surface) {
                 Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
             }
         });
+
         viewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -143,7 +152,10 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
                 Toast.makeText(view.getContext(), "Deleted " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
-        viewHolder.textViewPos.setText((position + 1) + ".");
+
+        String positionText = String.valueOf(position + 1) + ".";
+
+        viewHolder.textViewPos.setText(positionText);
         viewHolder.textViewData.setText(exercise.getExerciseName());
         mItemManger.bindView(viewHolder.itemView, position);
     }

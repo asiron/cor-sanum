@@ -17,6 +17,8 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
     private int mCurrentExerciseIndex = 0;
     private Exercise mCurrentExercise = null;
 
+    private MapFragment mMapFragment                     = null;
+    private ExerciseDetailHeaderFragment mHeaderFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,15 +28,13 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
         mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx),0);
         mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
 
-        ExerciseDetailHeaderFragment headerFragment =
-                (ExerciseDetailHeaderFragment) getFragmentManager()
+        mHeaderFragment = (ExerciseDetailHeaderFragment) getFragmentManager()
                         .findFragmentById(R.id.exercise_detail_header);
 
-        MapFragment mapFragment =
-                (MapFragment) getFragmentManager()
+        mMapFragment = (MapFragment) getFragmentManager()
                         .findFragmentById(R.id.map);
 
-        mapFragment.getMapAsync(this);
+        mMapFragment.getMapAsync(this);
     }
 
     @Override
@@ -43,6 +43,12 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
         map.addMarker(new MarkerOptions()
                 .position(sydney).title("Marker in Sydney"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mHeaderFragment.updateAdapter(mExerciseList.get(mCurrentExerciseIndex).getActions());
     }
 
     public void initMap() {

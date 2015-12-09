@@ -6,11 +6,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toolbar;
+import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
+import com.google.gson.Gson;
 
 import lu.uni.psod.corsanum.models.Action;
 import lu.uni.psod.corsanum.models.ActionType;
@@ -29,17 +33,19 @@ import lu.uni.psod.corsanum.utils.ModelUtils;
 public class MyExercises extends BaseActivity {
 
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ExercisesRecyclerViewAdapter mAdapter;
 
     private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.recyclerview);
 
         toolbar = (Toolbar) findViewById(R.id.exercise_tool_bar);
-        setActionBar(toolbar);
+
+        setSupportActionBar(toolbar);
 
         // Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -49,15 +55,19 @@ public class MyExercises extends BaseActivity {
 
         // Item Decorator
         recyclerView.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.divider)));
+
         recyclerView.setItemAnimator(new FadeInLeftAnimator());
 
         // Adapter
         mAdapter = new ExercisesRecyclerViewAdapter(this, mExerciseList);
+
         ((ExercisesRecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
+
         recyclerView.setAdapter(mAdapter);
 
         // Listeners
         recyclerView.setOnScrollListener(onScrollListener);
+
     }
 
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
@@ -73,13 +83,34 @@ public class MyExercises extends BaseActivity {
         }
     };
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_search_exercise) {
+            Toast.makeText(this, "Implement Search! ", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_add_exercise){
+            Toast.makeText(this, "Implement Add! ", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onResume() {
+        super.onResume();
+        mAdapter.updateDataset(mExerciseList);
     }
+
 }
