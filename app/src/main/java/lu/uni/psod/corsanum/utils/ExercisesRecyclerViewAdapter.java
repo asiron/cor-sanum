@@ -119,9 +119,8 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
                 if (viewHolder.canEnter == false)
                     return;
 
-                Gson gson = new Gson();
                 Intent intent = new Intent(mContext, ExerciseDetailActivity.class);
-                intent.putExtra("exercise", gson.toJson(exercise));
+                intent.putExtra(mContext.getString(R.string.current_exercise_idx), position);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
                 mContext.startActivity(intent, options.toBundle());

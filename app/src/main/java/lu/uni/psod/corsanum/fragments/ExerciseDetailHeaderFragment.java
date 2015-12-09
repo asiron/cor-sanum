@@ -16,6 +16,7 @@ import com.daimajia.swipe.util.Attributes;
 import com.google.gson.Gson;
 
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
+import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.Exercise;
 import lu.uni.psod.corsanum.utils.ActionsRecyclerViewAdapter;
@@ -27,11 +28,9 @@ import lu.uni.psod.corsanum.utils.ExercisesRecyclerViewAdapter;
  */
 public class ExerciseDetailHeaderFragment extends Fragment {
 
-    Gson gson = null;
     TextView tv_title = null;
-    Exercise exercise = null;
 
-    Activity activity = null;
+    ExerciseDetailActivity activity = null;
 
     private RecyclerView actionsRecyclerView;
     private RecyclerView.Adapter actionsRecyclerViewAdapter;
@@ -49,14 +48,7 @@ public class ExerciseDetailHeaderFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        activity = getActivity();
-
-        gson = new Gson();
-        String exercise_json = activity.getIntent().getStringExtra("exercise");
-        exercise = gson.fromJson(exercise_json, Exercise.class);
-
-        Log.i("AAA", gson.toJson(exercise));
-
+        activity = (ExerciseDetailActivity) getActivity();
 
         actionsRecyclerView = (RecyclerView) activity.findViewById(R.id.recycler_view_actions);
 
@@ -67,7 +59,9 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         actionsRecyclerView.setItemAnimator(new FadeInLeftAnimator());
 
         // Adapter:
-        actionsRecyclerViewAdapter = new ActionsRecyclerViewAdapter(activity, exercise.getActions());
+        actionsRecyclerViewAdapter = new ActionsRecyclerViewAdapter(activity,
+               activity.getCurrentExercise().getActions());
+
         ((ActionsRecyclerViewAdapter) actionsRecyclerViewAdapter).setMode(Attributes.Mode.Single);
         actionsRecyclerView.setAdapter(actionsRecyclerViewAdapter);
 
@@ -75,7 +69,7 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         actionsRecyclerView.setOnScrollListener(onScrollListener);
 
         tv_title = (TextView) activity.findViewById(R.id.exercise_detail_title);
-        tv_title.setText(exercise.getExerciseName());
+        tv_title.setText(activity.getCurrentExercise().getExerciseName());
     }
 
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {

@@ -2,6 +2,7 @@ package lu.uni.psod.corsanum;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,14 @@ public abstract class BaseActivity extends Activity {
 
     protected ArrayList<Exercise> mExerciseList;
 
+    public ArrayList<Exercise> getExerciseList() {
+        return mExerciseList;
+    }
+
+    public void setExerciseList(ArrayList<Exercise> exerciseList) {
+        this.mExerciseList = exerciseList;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,8 +31,9 @@ public abstract class BaseActivity extends Activity {
     }
 
     @Override
-    protected void onStop(){
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        Log.i("A", "SAVED!!");
         ModelUtils.saveExercises(this, mExerciseList);
     }
 
