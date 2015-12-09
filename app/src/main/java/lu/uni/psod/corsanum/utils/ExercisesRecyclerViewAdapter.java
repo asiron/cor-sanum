@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +38,6 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
         boolean canEnter;
 
-
         public SimpleViewHolder(View itemView) {
             super(itemView);
             swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
@@ -45,31 +45,20 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
             textViewData = (TextView) itemView.findViewById(R.id.text_data);
             buttonDelete = (Button) itemView.findViewById(R.id.delete);
 
-            /*
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d(getClass().getSimpleName(), "onItemSelected: " + textViewData.getText().toString());
-                    Toast.makeText(view.getContext(), "onItemSelected: " + textViewData.getText().toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            */
             canEnter = true;
         }
     }
 
     private Context mContext;
-    private ArrayList<Exercise> mDataset;
+    private ArrayList<Exercise> mExerciseList;
+    private ArrayList<Exercise> mFilteredExerciseList;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
     public ExercisesRecyclerViewAdapter(Context context, ArrayList<Exercise> objects) {
         this.mContext = context;
-        this.mDataset = objects;
-    }
-
-    public void updateDataset(ArrayList<Exercise> mDataset) {
-        this.mDataset = mDataset;
+        this.mExerciseList = objects;
+        this.mFilteredExerciseList = new ArrayList<Exercise>(objects);
     }
 
     @Override
@@ -80,7 +69,7 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder viewHolder, final int position) {
-        final Exercise exercise = mDataset.get(position);
+        final Exercise exercise = mExerciseList.get(position);
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
@@ -98,21 +87,6 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
                 viewHolder.canEnter = true;
             }
 
-            /*
-            @Override
-            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-
-            }
-
-            @Override
-            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-            }
-
-            @Override
-            public void onStartClose(SwipeLayout layout) {
-                Log.i("AAA", "start close");
-            }
-            */
         });
         viewHolder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,9 +119,13 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
             @Override
             public void onClick(View view) {
                 mItemManger.removeShownLayouts(viewHolder.swipeLayout);
-                mDataset.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, mDataset.size());
+
+                removeItem(position);
+
+                //mExerciseList.remove(position);
+                //notifyItemRemoved(position);
+
+                notifyItemRangeChanged(position, mExerciseList.size());
                 mItemManger.closeAllItems();
                 Toast.makeText(view.getContext(), "Deleted " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
@@ -162,11 +140,66 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return mExerciseList.size();
     }
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
         return R.id.swipe;
+    }
+
+    public void updateDataset(ArrayList<Exercise> mExerciseList) {
+        this.mExerciseList = mExerciseList;
+    }
+
+    public Exercise removeItem(int position) {
+        final Exercise exc = mExerciseList.remove(position);
+        notifyItemRemoved(position);
+        return exc;
+    }
+
+    public void addItem(int position, Exercise exc) {
+        mExerciseList.add(position, exc);
+        notifyItemInserted(position);
+    }
+
+    public void moveItem(int fromPosition, int toPosition) {
+        final Exercise exc = mExerciseList.remove(fromPosition);
+        mExerciseList.add(toPosition, exc);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    public void animateTo(ArrayList<Exercise> excs) {
+        applyAndAnimateRemovals(excs);
+        applyAndAnimateAdditions(excs);
+        applyAndAnimateMovedItems(excs);
+    }
+
+    private void applyAndAnimateRemovals(ArrayList<Exercise> newExercises) {
+        for (int i = mExerciseList.size() - 1; i >= 0; i--) {
+            final Exercise exc = mExerciseList.get(i);
+            if (!newExercises.contains(exc)) {
+                removeItem(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateAdditions(ArrayList<Exercise> newExercises) {
+        for (int i = 0, count = newExercises.size(); i < count; i++) {
+            final Exercise exc = newExercises.get(i);
+            if (!mExerciseList.contains(exc)) {
+                addItem(i, exc);
+            }
+        }
+    }
+
+    private void applyAndAnimateMovedItems(ArrayList<Exercise> newExercises) {
+        for (int toPosition = newExercises.size() - 1; toPosition >= 0; toPosition--) {
+            final Exercise exc = newExercises.get(toPosition);
+            final int fromPosition = mExerciseList.indexOf(exc);
+            if (fromPosition >= 0 && fromPosition != toPosition) {
+                moveItem(fromPosition, toPosition);
+            }
+        }
     }
 }

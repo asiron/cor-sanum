@@ -48,7 +48,7 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
     @Override
     protected void onResume() {
         super.onResume();
-        mHeaderFragment.updateAdapter(mExerciseList.get(mCurrentExerciseIndex).getActions());
+        mHeaderFragment.updateAdapterDataset(mExerciseList.get(mCurrentExerciseIndex).getActions());
     }
 
     public void initMap() {
