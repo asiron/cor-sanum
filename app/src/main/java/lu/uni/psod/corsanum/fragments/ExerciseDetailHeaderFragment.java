@@ -36,7 +36,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
     private RecyclerView actionsRecyclerView;
     private ActionsRecyclerViewAdapter actionsRecyclerViewAdapter;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +63,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         ((ActionsRecyclerViewAdapter) actionsRecyclerViewAdapter).setMode(Attributes.Mode.Single);
         actionsRecyclerView.setAdapter(actionsRecyclerViewAdapter);
 
-        /* Listeners */
-        actionsRecyclerView.setOnScrollListener(onScrollListener);
-
         exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_detail_title);
         exerciseTitleTextView.setText(activity.getCurrentExercise().getExerciseName());
 
@@ -81,22 +77,8 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         });
     }
 
-    public void updateAdapter(ArrayList<Action> objects) {
+    public void updateAdapterDataset(ArrayList<Action> objects) {
         actionsRecyclerViewAdapter.updateDataset(objects);
     }
-
-    RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-            Log.e("ListView", "onScrollStateChanged");
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            // Could hide open views here if you wanted. //
-        }
-    };
 
 }

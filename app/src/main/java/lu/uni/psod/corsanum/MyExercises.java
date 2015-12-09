@@ -4,8 +4,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 import lu.uni.psod.corsanum.utils.ModelUtils;
 
-public class MyExercises extends BaseActivity {
+public class MyExercises extends BaseActivity implements SearchView.OnQueryTextListener {
 
     private RecyclerView recyclerView;
     private ExercisesRecyclerViewAdapter mAdapter;
@@ -65,11 +67,14 @@ public class MyExercises extends BaseActivity {
 
         recyclerView.setAdapter(mAdapter);
 
+        mAdapter.getFilter().filter("Long");
+
         // Listeners
-        recyclerView.setOnScrollListener(onScrollListener);
+        // recyclerView.setOnScrollListener(onScrollListener);
 
     }
 
+    /*
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -82,12 +87,17 @@ public class MyExercises extends BaseActivity {
             super.onScrolled(recyclerView, dx, dy);
         }
     };
-
+    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
+        final MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+
         return true;
     }
 
@@ -96,10 +106,7 @@ public class MyExercises extends BaseActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_search_exercise) {
-            Toast.makeText(this, "Implement Search! ", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (id == R.id.action_add_exercise){
+        if (id == R.id.action_add_exercise){
             Toast.makeText(this, "Implement Add! ", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -113,4 +120,30 @@ public class MyExercises extends BaseActivity {
         mAdapter.updateDataset(mExerciseList);
     }
 
+    @Override
+    public boolean onQueryTextChange(String query) {
+        final ArrayList<Exercise> filteredModelList = filter(mExerciseList, query);
+        Log.i("CECECE", new Gson().toJson(filteredModelList));
+        mAdapter.animateTo(filteredModelList);
+        recyclerView.scrollToPosition(0);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    private ArrayList<Exercise> filter(ArrayList<Exercise> models, String query) {
+        query = query.toLowerCase();
+
+        final ArrayList<Exercise> filteredModelList = new ArrayList<>();
+        for (Exercise model : models) {
+            final String text = model.getExerciseName().toLowerCase();
+            if (text.contains(query)) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
+    }
 }
