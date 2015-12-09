@@ -31,6 +31,7 @@ import lu.uni.psod.corsanum.models.Exercise;
 public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecyclerViewAdapter.SimpleViewHolder> {
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
+
         SwipeLayout swipeLayout;
         TextView textViewPos;
         TextView textViewData;
