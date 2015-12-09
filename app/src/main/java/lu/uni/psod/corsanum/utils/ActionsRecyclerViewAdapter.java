@@ -3,6 +3,7 @@ package lu.uni.psod.corsanum.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,15 +32,20 @@ import lu.uni.psod.corsanum.models.Exercise;
 
 public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecyclerViewAdapter.SimpleViewHolder> {
 
+    private int mSelectedPosition = -1;
+
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
 
-        SwipeLayout swipeLayout;
-        TextView textViewPos;
-        TextView textViewData;
-        Button buttonDelete;
-        Button buttonEdit;
+        private SwipeLayout swipeLayout;
+        private TextView textViewPos;
+        private TextView textViewData;
+        private Button buttonDelete;
+        private Button buttonEdit;
+
+        private LinearLayout surface;
 
         boolean canEnter;
+
 
 
         public SimpleViewHolder(View itemView) {
@@ -48,9 +55,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
             textViewData = (TextView) itemView.findViewById(R.id.action_title);
             buttonDelete = (Button) itemView.findViewById(R.id.delete_action);
             buttonEdit   = (Button) itemView.findViewById(R.id.edit_action);
-
-            if (swipeLayout == null)
-                Log.i("B", "URWA");
+            surface = (LinearLayout) itemView.findViewById(R.id.action_surface);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,7 +81,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
     @Override
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actions_recyclerview_item, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actions_recyclerview_item, parent, false);
         return new SimpleViewHolder(view);
     }
 
@@ -88,34 +93,34 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
             @Override
             public void onOpen(SwipeLayout layout) {
                 //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
-                Log.i("AAA", "open");
+                Log.i("SwipeLayoutAction", "open");
                 Log.i("JSON", (new Gson()).toJson(mDataset));
             }
 
             @Override
             public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                Log.i("AAA", "update");
+                Log.i("SwipeLayoutAction", "update");
             }
 
             @Override
             public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                Log.i("AAA", "hand release");
+                Log.i("SwipeLayoutAction", "hand release");
             }
 
             @Override
             public void onStartOpen(SwipeLayout layout) {
-                Log.i("AAA", "start open");
+                Log.i("SwipeLayoutAction", "start open");
                 viewHolder.canEnter = false;
             }
 
             @Override
             public void onStartClose(SwipeLayout layout) {
-                Log.i("AAA", "start close");
+                Log.i("SwipeLayoutAction", "start close");
             }
 
             @Override
             public void onClose(SwipeLayout layout) {
-                Log.i("AAA", "close");
+                Log.i("SwipeLayoutAction", "close");
                 viewHolder.canEnter = true;
             }
 
@@ -125,13 +130,9 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
             public void onClick(View v) {
                 if (viewHolder.canEnter == false)
                     return;
-                /*
-                Intent intent = new Intent(mContext, ExerciseDetailActivity.class);
-                intent.putExtra("title", exerciseName);
-                ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation((Activity) mContext, (View) viewHolder.textViewData, "exc_name");
-                mContext.startActivity(intent, options.toBundle());
-                */
+
+                mSelectedPosition = position;
+                notifyDataSetChanged();
             }
         });
         viewHolder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
@@ -159,6 +160,11 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
             }
         });
+        if (position == mSelectedPosition && mSelectedPosition != -1) {
+            viewHolder.surface.setBackgroundColor(mContext.getResources().getColor(R.color.backgroundColorSelected));
+        } else {
+            viewHolder.surface.setBackgroundColor(mContext.getResources().getColor(R.color.backgroundColor));
+        }
         viewHolder.textViewPos.setText((position + 1) + ".");
         viewHolder.textViewData.setText(exerciseName);
         mItemManger.bindView(viewHolder.itemView, position);

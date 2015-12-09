@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 import com.google.gson.Gson;
@@ -29,6 +31,7 @@ import lu.uni.psod.corsanum.utils.ExercisesRecyclerViewAdapter;
 public class ExerciseDetailHeaderFragment extends Fragment {
 
     TextView tv_title = null;
+    Button startExercise = null;
 
     ExerciseDetailActivity activity = null;
 
@@ -70,6 +73,16 @@ public class ExerciseDetailHeaderFragment extends Fragment {
 
         tv_title = (TextView) activity.findViewById(R.id.exercise_detail_title);
         tv_title.setText(activity.getCurrentExercise().getExerciseName());
+
+        startExercise = (Button) activity.findViewById(R.id.start_exercise);
+        startExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(activity, "Implement Exercise Activity! ", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
