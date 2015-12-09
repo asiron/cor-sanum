@@ -46,16 +46,19 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
         boolean canEnter;
 
-
-
         public SimpleViewHolder(View itemView) {
             super(itemView);
-            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.actions_swipe_layout);
-            textViewPos = (TextView) itemView.findViewById(R.id.action_position);
+
+            canEnter = true;
+
+            surface      = (LinearLayout) itemView.findViewById(R.id.action_surface);
+            swipeLayout  = (SwipeLayout) itemView.findViewById(R.id.actions_swipe_layout);
+            textViewPos  = (TextView) itemView.findViewById(R.id.action_position);
             textViewData = (TextView) itemView.findViewById(R.id.action_title);
             buttonDelete = (Button) itemView.findViewById(R.id.delete_action);
             buttonEdit   = (Button) itemView.findViewById(R.id.edit_action);
-            surface = (LinearLayout) itemView.findViewById(R.id.action_surface);
+
+            /*
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -65,7 +68,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
                 }
             });
 
-            canEnter = true;
+            */
         }
     }
 
@@ -76,6 +79,10 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
     public ActionsRecyclerViewAdapter(Context context, ArrayList<Action> objects) {
         this.mContext = context;
+        this.mDataset = objects;
+    }
+
+    public void updateDataset(ArrayList<Action> objects) {
         this.mDataset = objects;
     }
 
@@ -90,11 +97,10 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
         final String exerciseName = mDataset.get(position).getActionType().toString();
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
+            /*
             @Override
             public void onOpen(SwipeLayout layout) {
-                //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
                 Log.i("SwipeLayoutAction", "open");
-                Log.i("JSON", (new Gson()).toJson(mDataset));
             }
 
             @Override
@@ -108,14 +114,14 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
             }
 
             @Override
+            public void onStartClose(SwipeLayout layout) {
+                Log.i("SwipeLayoutAction", "start close");
+            }
+            */
+            @Override
             public void onStartOpen(SwipeLayout layout) {
                 Log.i("SwipeLayoutAction", "start open");
                 viewHolder.canEnter = false;
-            }
-
-            @Override
-            public void onStartClose(SwipeLayout layout) {
-                Log.i("SwipeLayoutAction", "start close");
             }
 
             @Override
@@ -160,12 +166,16 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
             }
         });
+
         if (position == mSelectedPosition && mSelectedPosition != -1) {
             viewHolder.surface.setBackgroundColor(mContext.getResources().getColor(R.color.backgroundColorSelected));
         } else {
             viewHolder.surface.setBackgroundColor(mContext.getResources().getColor(R.color.backgroundColor));
         }
-        viewHolder.textViewPos.setText((position + 1) + ".");
+
+        String positionText = String.valueOf(position + 1) + ".";
+
+        viewHolder.textViewPos.setText(positionText);
         viewHolder.textViewData.setText(exerciseName);
         mItemManger.bindView(viewHolder.itemView, position);
     }

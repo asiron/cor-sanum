@@ -2,6 +2,8 @@ package lu.uni.psod.corsanum.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -16,16 +18,19 @@ import lu.uni.psod.corsanum.models.Exercise;
  */
 public class ModelUtils {
 
+    private static final String TAG = "ModelUtils";
     private static final Gson GSON = new Gson();
     private static final Type EXERCISE_LIST_TYPE = new TypeToken<ArrayList<Exercise>>(){}.getType();
 
     public static String getSavedData(Context ctx, String key) {
+        Log.i(TAG, "Trying to retrieve value for key: " + key);
         SharedPreferences sp = ctx.getSharedPreferences(
                 ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         return sp.getString(key, "");
     }
 
     public static void saveData(Context ctx, String key, String value) {
+        Log.i(TAG, "Saving value: " + value + " for key: " + key);
         SharedPreferences sp = ctx.getSharedPreferences(
                 ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -34,11 +39,13 @@ public class ModelUtils {
     }
 
     public static void saveExercises(Context ctx, ArrayList<Exercise> exercises) {
+        Log.i(TAG, "Saving exercises");
         saveData(ctx, ctx.getString(R.string.saved_exercise_list), GSON.toJson(exercises));
     }
 
     public static ArrayList<Exercise> loadExercises(Context ctx) {
-        return (ArrayList<Exercise>) GSON.fromJson(
+        Log.i(TAG, "Loading exercises");
+        return (ArrayList <Exercise>) GSON.fromJson(
                 getSavedData(ctx, ctx.getString(R.string.saved_exercise_list)),
                 EXERCISE_LIST_TYPE
         );
