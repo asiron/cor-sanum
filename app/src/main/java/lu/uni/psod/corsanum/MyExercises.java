@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toolbar;
 
 import com.daimajia.swipe.util.Attributes;
 
@@ -30,11 +31,15 @@ public class MyExercises extends BaseActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
 
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recyclerview);
+
+        toolbar = (Toolbar) findViewById(R.id.exercise_tool_bar);
+        setActionBar(toolbar);
 
         // Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
