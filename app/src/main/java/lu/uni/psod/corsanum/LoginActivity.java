@@ -122,7 +122,7 @@ public class LoginActivity extends Activity {
                 Exercise ex1 = new Exercise("Long run in Park");
                 ex1.getActions().add(new Action(new Position(49.628025, 6.159010), new Position(49.632136, 6.150895), 0.0, ActionType.RUN));
                 ex1.getActions().add(new Action(new Position(49.632136, 6.150895), new Position(49.627945, 6.142899), 0.0, ActionType.WALK_FAST));
-                ex1.getActions().add(new Action(new Position(49.627945, 6.142899), new Position(49.627945, 6.142899), 2.0, ActionType.STRETCH));
+                ex1.getActions().add(new Action(new Position(49.627945, 6.142999), new Position(49.627945, 6.142999), 2.0, ActionType.STRETCH));
 
                 Exercise ex2 = new Exercise("Stretching session");
                 ex2.getActions().add(new Action(new Position(0,0), new Position(0,0), 5.0, ActionType.STRETCH));

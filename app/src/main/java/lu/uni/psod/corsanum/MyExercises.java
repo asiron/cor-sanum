@@ -66,9 +66,7 @@ public class MyExercises extends BaseActivity implements SearchView.OnQueryTextL
         ((ExercisesRecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
 
         recyclerView.setAdapter(mAdapter);
-
-        mAdapter.getFilter().filter("Long");
-
+        
         // Listeners
         // recyclerView.setOnScrollListener(onScrollListener);
 

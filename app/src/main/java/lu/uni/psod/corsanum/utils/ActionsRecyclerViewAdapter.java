@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
+import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 import lu.uni.psod.corsanum.models.Action;
 import lu.uni.psod.corsanum.models.Exercise;
 
@@ -58,26 +59,15 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
             buttonDelete = (Button) itemView.findViewById(R.id.delete_action);
             buttonEdit   = (Button) itemView.findViewById(R.id.edit_action);
 
-            /*
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d(getClass().getSimpleName(), "onItemSelected: " + textViewData.getText().toString());
-                    Toast.makeText(view.getContext(), "onItemSelected: " + textViewData.getText().toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            */
         }
     }
 
-    private Context mContext;
+    private ExerciseDetailHeaderFragment mContext;
     private ArrayList<Action> mDataset;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
-    public ActionsRecyclerViewAdapter(Context context, ArrayList<Action> objects) {
+    public ActionsRecyclerViewAdapter(ExerciseDetailHeaderFragment context, ArrayList<Action> objects) {
         this.mContext = context;
         this.mDataset = objects;
     }
@@ -97,27 +87,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
         final String exerciseName = mDataset.get(position).getActionType().toString();
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
-            /*
-            @Override
-            public void onOpen(SwipeLayout layout) {
-                Log.i("SwipeLayoutAction", "open");
-            }
 
-            @Override
-            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                Log.i("SwipeLayoutAction", "update");
-            }
-
-            @Override
-            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
-                Log.i("SwipeLayoutAction", "hand release");
-            }
-
-            @Override
-            public void onStartClose(SwipeLayout layout) {
-                Log.i("SwipeLayoutAction", "start close");
-            }
-            */
             @Override
             public void onStartOpen(SwipeLayout layout) {
                 Log.i("SwipeLayoutAction", "start open");
@@ -137,6 +107,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
                 if (viewHolder.canEnter == false)
                     return;
 
+                mContext.getActionSelectedCallback().onActionSelected(position);
                 mSelectedPosition = position;
                 notifyDataSetChanged();
             }
@@ -144,7 +115,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
         viewHolder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
             @Override
             public void onDoubleClick(SwipeLayout layout, boolean surface) {
-                Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext.getActivity(), "DoubleClick", Toast.LENGTH_SHORT).show();
             }
         });
         viewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
@@ -155,9 +126,11 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, mDataset.size());
                 mItemManger.closeAllItems();
+                mSelectedPosition = -1;
                 Toast.makeText(view.getContext(), "Deleted " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
+
         viewHolder.buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

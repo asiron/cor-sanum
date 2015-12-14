@@ -17,24 +17,24 @@ public class Position {
     public Position() {
     }
 
-    public Position(double mLongitude, double mLatitude) {
+    public Position(double mLatitude, double mLongitude) {
+        this.mLatitude  = mLatitude;
         this.mLongitude = mLongitude;
-        this.mLatitude = mLatitude;
     }
 
-    public double getmLongitude() {
+    public double getLong() {
         return mLongitude;
     }
 
-    public void setmLongitude(double mLongitude) {
+    public void setLong(double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
-    public double getmLatitude() {
+    public double getLat() {
         return mLatitude;
     }
 
-    public void setmLatitude(double mLatitude) {
+    public void setLat(double mLatitude) {
         this.mLatitude = mLatitude;
     }
 }
