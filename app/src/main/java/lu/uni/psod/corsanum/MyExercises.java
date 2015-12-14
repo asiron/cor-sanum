@@ -25,12 +25,8 @@ import lu.uni.psod.corsanum.models.Position;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
 import lu.uni.psod.corsanum.utils.ExercisesRecyclerViewAdapter;
 
-//import com.daimajia.swipedemo.adapter.util.DividerItemDecoration;
-
-import java.util.ArrayList;
 
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
-import lu.uni.psod.corsanum.utils.ModelUtils;
 
 public class MyExercises extends BaseActivity implements SearchView.OnQueryTextListener {
 
@@ -66,26 +62,8 @@ public class MyExercises extends BaseActivity implements SearchView.OnQueryTextL
         ((ExercisesRecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
 
         recyclerView.setAdapter(mAdapter);
-        
-        // Listeners
-        // recyclerView.setOnScrollListener(onScrollListener);
 
     }
-
-    /*
-    RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-            Log.e("ListView", "onScrollStateChanged");
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-        }
-    };
-    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -120,9 +98,7 @@ public class MyExercises extends BaseActivity implements SearchView.OnQueryTextL
 
     @Override
     public boolean onQueryTextChange(String query) {
-        final ArrayList<Exercise> filteredModelList = filter(mExerciseList, query);
-        Log.i("CECECE", new Gson().toJson(filteredModelList));
-        mAdapter.animateTo(filteredModelList);
+        mAdapter.filter(query);
         recyclerView.scrollToPosition(0);
         return true;
     }
@@ -132,16 +108,4 @@ public class MyExercises extends BaseActivity implements SearchView.OnQueryTextL
         return false;
     }
 
-    private ArrayList<Exercise> filter(ArrayList<Exercise> models, String query) {
-        query = query.toLowerCase();
-
-        final ArrayList<Exercise> filteredModelList = new ArrayList<>();
-        for (Exercise model : models) {
-            final String text = model.getExerciseName().toLowerCase();
-            if (text.contains(query)) {
-                filteredModelList.add(model);
-            }
-        }
-        return filteredModelList;
-    }
 }

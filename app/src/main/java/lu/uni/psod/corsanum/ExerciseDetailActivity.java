@@ -128,7 +128,7 @@ public class ExerciseDetailActivity extends BaseActivity
         };
 
         List<LatLng> waypoints = new ArrayList<LatLng>();
-        
+
         for(int i=0; i<mMarkers.size(); ++i) {
             waypoints.add(mMarkers.get(i).getPosition());
         }
