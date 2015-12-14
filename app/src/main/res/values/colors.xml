@@ -10,4 +10,6 @@
     <color name="red_press">#990000</color>
     <color name="dark_gray">#4C535B</color>
     <color name="dark_gray_press">#ff7e8a97</color>
+    <color name="route_highlighted">#8540B2</color>
+    <color name="route_default">#FF6FFC</color>
 </resources>

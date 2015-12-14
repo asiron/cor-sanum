@@ -1,5 +1,6 @@
 package lu.uni.psod.corsanum.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,10 @@ import lu.uni.psod.corsanum.utils.DividerItemDecoration;
  */
 public class ExerciseDetailHeaderFragment extends Fragment {
 
+    public interface OnActionSelectedListener {
+        public void onActionSelected(int position);
+    }
+
     TextView exerciseTitleTextView = null;
     Button startExerciseButton = null;
 
@@ -35,6 +40,22 @@ public class ExerciseDetailHeaderFragment extends Fragment {
 
     private RecyclerView actionsRecyclerView;
     private ActionsRecyclerViewAdapter actionsRecyclerViewAdapter;
+
+    private OnActionSelectedListener mActionSelectedCallback;
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mActionSelectedCallback = (OnActionSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +78,7 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         actionsRecyclerView.setItemAnimator(new FadeInLeftAnimator());
 
         // Adapter:
-        actionsRecyclerViewAdapter = new ActionsRecyclerViewAdapter(activity,
+        actionsRecyclerViewAdapter = new ActionsRecyclerViewAdapter(this,
                activity.getCurrentExercise().getActions());
 
         ((ActionsRecyclerViewAdapter) actionsRecyclerViewAdapter).setMode(Attributes.Mode.Single);
@@ -81,4 +102,8 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         actionsRecyclerViewAdapter.updateDataset(objects);
     }
 
+
+    public OnActionSelectedListener getActionSelectedCallback() {
+        return mActionSelectedCallback;
+    }
 }
