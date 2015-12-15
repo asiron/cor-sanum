@@ -1,5 +1,6 @@
 package lu.uni.psod.corsanum;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -21,56 +22,51 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lu.uni.psod.corsanum.fragments.ControlExerciseFragment;
 import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 import lu.uni.psod.corsanum.models.Action;
 import lu.uni.psod.corsanum.models.Exercise;
 import lu.uni.psod.corsanum.models.Position;
 
-public class ExerciseDetailActivity extends BaseActivity
-        implements OnMapReadyCallback, ExerciseDetailHeaderFragment.OnActionSelectedListener
-{
+public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback {
 
-    private final String TAG = "ExerciseDetailActivity";
+    private final String TAG = "ExerciseActivity";
+
+    private MapFragment mMapFragment = null;
+    private ControlExerciseFragment mControlExerciseFragment  = null;
+
+    private GoogleMap mMap = null;
+
+    private HashMap<Integer, Marker> mMarkers;
 
     private int mCurrentExerciseIndex = 0;
     private Exercise mCurrentExercise = null;
 
-    private MapFragment mMapFragment                     = null;
-    private ExerciseDetailHeaderFragment mHeaderFragment = null;
-
-    private HashMap<Integer, Marker> mMarkers;
-
-    private GoogleMap mMap = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exercise_detail);
+        setContentView(R.layout.activity_exercise);
 
-        mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx),0);
+        mMarkers = new HashMap<Integer, Marker>();
+
+        mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx), 0);
         mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
 
-        mHeaderFragment = (ExerciseDetailHeaderFragment) getFragmentManager()
-                        .findFragmentById(R.id.exercise_detail_header);
+        mControlExerciseFragment = (ControlExerciseFragment) getFragmentManager()
+                .findFragmentById(R.id.control_exercise);
 
         mMapFragment = (MapFragment) getFragmentManager()
-                        .findFragmentById(R.id.exercise_detail_map);
-
-        mMarkers = new HashMap<>() ;
+                .findFragmentById(R.id.control_exercise_map);
 
         mMapFragment.getMapAsync(this);
+
+
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
         initMap();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mHeaderFragment.updateAdapterDataset(mExerciseList.get(mCurrentExerciseIndex).getActions());
     }
 
     public void initMap() {
@@ -180,18 +176,5 @@ public class ExerciseDetailActivity extends BaseActivity
         }
         LatLngBounds bounds = builder.build();
         return bounds;
-    }
-
-    public int getCurrentExerciseIndex() {
-        return mCurrentExerciseIndex;
-    }
-
-    public Exercise getCurrentExercise() {
-        return mCurrentExercise;
-    }
-
-    @Override
-    public void onActionSelected(int position) {
-        mMarkers.get(0).setRotation(90.0f);
     }
 }
