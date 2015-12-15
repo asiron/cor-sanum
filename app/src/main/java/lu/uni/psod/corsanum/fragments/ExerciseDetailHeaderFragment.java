@@ -2,7 +2,9 @@ package lu.uni.psod.corsanum.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,9 +20,11 @@ import com.daimajia.swipe.util.Attributes;
 import java.util.ArrayList;
 
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
+import lu.uni.psod.corsanum.ExerciseActivity;
 import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.Action;
+import lu.uni.psod.corsanum.models.Exercise;
 import lu.uni.psod.corsanum.utils.ActionsRecyclerViewAdapter;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
 
@@ -28,6 +32,8 @@ import lu.uni.psod.corsanum.utils.DividerItemDecoration;
  * Created by rlopez on 08/12/15.
  */
 public class ExerciseDetailHeaderFragment extends Fragment {
+
+    private final String TAG = "ExerciseDetailHeader";
 
     public interface OnActionSelectedListener {
         public void onActionSelected(int position);
@@ -92,7 +98,21 @@ public class ExerciseDetailHeaderFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(activity, "Implement Exercise Activity! ", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "Launching Exercise activity.");
+
+                Intent intent = new Intent(activity, ExerciseActivity.class);
+                intent.putExtra(activity.getString(R.string.current_exercise_idx), activity.getCurrentExerciseIndex());
+
+//                ActivityOptionsCompat options = ActivityOptionsCompat.
+//                        makeSceneTransitionAnimation(
+//                                activity,
+//                                (View) viewHolder.textViewData,
+//                                mContext.getString(R.string.exc_detail_tran_name)
+//                        );
+
+                activity.startActivity(intent);
+
+                //Toast.makeText(activity, "Implement Exercise Activity! ", Toast.LENGTH_SHORT).show();
 
             }
         });
