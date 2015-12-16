@@ -2,7 +2,7 @@ package lu.uni.psod.corsanum.helpers;
 
 import java.util.ArrayList;
 
-import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.fit.Exercise;
 
 /**
  * Created by rlopez on 10/12/15.

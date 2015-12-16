@@ -1,9 +1,10 @@
-package lu.uni.psod.corsanum.models;
+package lu.uni.psod.corsanum.models.fit;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import lu.uni.psod.corsanum.models.fit.Action;
 
 /**
  * Created by asiron on 12/6/15.

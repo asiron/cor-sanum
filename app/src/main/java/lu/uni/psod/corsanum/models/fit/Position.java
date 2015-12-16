@@ -1,4 +1,4 @@
-package lu.uni.psod.corsanum.models;
+package lu.uni.psod.corsanum.models.fit;
 
 import com.google.gson.annotations.SerializedName;
 

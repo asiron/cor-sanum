@@ -19,9 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,10 +49,10 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import lu.uni.psod.corsanum.models.Action;
-import lu.uni.psod.corsanum.models.ActionType;
-import lu.uni.psod.corsanum.models.Exercise;
-import lu.uni.psod.corsanum.models.Position;
+import lu.uni.psod.corsanum.models.fit.Action;
+import lu.uni.psod.corsanum.models.fit.ActionType;
+import lu.uni.psod.corsanum.models.fit.Exercise;
+import lu.uni.psod.corsanum.models.fit.Position;
 
 
 /**

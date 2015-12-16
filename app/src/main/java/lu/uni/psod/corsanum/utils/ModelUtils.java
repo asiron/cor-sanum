@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.R;
-import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.fit.Exercise;
 
 /**
  * Created by rlopez on 08/12/15.

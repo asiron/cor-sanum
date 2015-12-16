@@ -1,14 +1,33 @@
 package lu.uni.psod.corsanum.fragments;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.fitness.FitnessStatusCodes;
+
+import lu.uni.psod.corsanum.ExerciseActivity;
+import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
+import lu.uni.psod.corsanum.services.GoogleFitService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +40,8 @@ import lu.uni.psod.corsanum.R;
 public class ControlExerciseFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String TAG = "ControlExerciseFragment";
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -29,6 +50,22 @@ public class ControlExerciseFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private ExerciseActivity activity = null;
+
+    private ConnectionResult mFitResultResolution;
+    private static final String AUTH_PENDING = "auth_state_pending";
+    private boolean authInProgress = false;
+    private static final int REQUEST_OAUTH = 1431;
+
+    private TextView exerciseTitleTextView = null;
+
+    private TextView stepCountTextView = null;
+    private TextView speedTextView     = null;
+
+    private Button stopExerciseButton       = null;
+    private ToggleButton startPauseExercise = null;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -59,6 +96,70 @@ public class ControlExerciseFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        activity = (ExerciseActivity) getActivity();
+
+        stepCountTextView  = (TextView) activity.findViewById(R.id.step_count);
+        speedTextView      = (TextView) activity.findViewById(R.id.speed);
+        stopExerciseButton = (Button) activity.findViewById(R.id.stop_exercise);
+        startPauseExercise = (ToggleButton) activity.findViewById(R.id.start_pause_exercise);
+        exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_title);
+
+        exerciseTitleTextView.setText(activity.getCurrentExercise().getExerciseName());
+
+        startPauseExercise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean on = ((ToggleButton) v).isChecked();
+                if (on) {
+                    Log.i(TAG, "Starting/Resuming exercise");
+                    stopExerciseButton.setVisibility(View.VISIBLE);
+                    startResumeExercise();
+
+                } else {
+                    Log.i(TAG, "Pausing exercise");
+                    stopExerciseButton.setVisibility(View.VISIBLE);
+                    pauseExercise();
+                }
+            }
+        });
+
+        stopExerciseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopExercise();
+            }
+        });
+
+        LocalBroadcastManager
+                .getInstance(activity)
+                .registerReceiver(mFitStatusReceiver, new IntentFilter(GoogleFitService.FIT_NOTIFY_INTENT));
+        LocalBroadcastManager
+                .getInstance(activity)
+                .registerReceiver(mFitDataReceiver, new IntentFilter(GoogleFitService.HISTORY_INTENT));
+
+    }
+
+    private void startResumeExercise() {
+        requestFitConnection();
+    }
+
+    private void pauseExercise() {
+    }
+
+    private void stopExercise() {
+
+    }
+
+    private void requestFitConnection() {
+        Intent service = new Intent(activity, GoogleFitService.class);
+        service.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
+        activity.startService(service);
     }
 
     @Override
@@ -108,4 +209,104 @@ public class ControlExerciseFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    private BroadcastReceiver mFitDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            if (intent.hasExtra(GoogleFitService.HISTORY_EXTRA_STEPS_TODAY)) {
+
+                final int totalSteps = intent.getIntExtra(GoogleFitService.HISTORY_EXTRA_STEPS_TODAY, 0);
+                Toast.makeText(activity, "Total Steps: " + totalSteps, Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    };
+
+    private BroadcastReceiver mFitStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            if (intent.hasExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE) &&
+                    intent.hasExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE)) {
+                //Recreate the connection result
+                int statusCode = intent.getIntExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE, 0);
+                PendingIntent pendingIntent = intent.getParcelableExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_INTENT);
+                ConnectionResult result = new ConnectionResult(statusCode, pendingIntent);
+                Log.d(TAG, "Fit connection failed - opening connect screen.");
+                fitHandleFailedConnection(result);
+            }
+            if (intent.hasExtra(GoogleFitService.FIT_EXTRA_CONNECTION_MESSAGE)) {
+                Log.d(TAG, "Fit connection successful - closing connect screen if it's open.");
+                fitHandleConnection();
+            }
+        }
+    };
+
+    private void fitHandleConnection() {
+        Toast.makeText(activity, "Fit connected", Toast.LENGTH_SHORT).show();
+        //mConnectButton.setEnabled(false);
+        //mGetStepsButton.setEnabled(true);
+    }
+
+    private void fitHandleFailedConnection(ConnectionResult result) {
+        Log.i(TAG, "Activity Thread Google Fit Connection failed. Cause: " + result.toString());
+        if (!result.hasResolution()) {
+            // Show the localized error dialog
+            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), activity, 0).show();
+            return;
+        }
+
+        // The failure has a resolution. Resolve it.
+        // Called typically when the app is not yet authorized, and an authorization dialog is displayed to the user.
+        if (!authInProgress) {
+            if (result.getErrorCode() == FitnessStatusCodes.NEEDS_OAUTH_PERMISSIONS) {
+                try {
+                    Log.d(TAG, "Google Fit connection failed with OAuth failure.  Trying to ask for consent (again)");
+                    result.startResolutionForResult(activity, REQUEST_OAUTH);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG, "Activity Thread Google Fit Exception while starting resolution activity", e);
+                }
+            } else {
+
+                Log.i(TAG, "Activity Thread Google Fit Attempting to resolve failed connection");
+
+                mFitResultResolution = result;
+                //mConnectButton.setEnabled(true);
+            }
+        }
+    }
+
+    private void fitActivityResult(int requestCode, int resultCode) {
+        if (requestCode == REQUEST_OAUTH) {
+            authInProgress = false;
+            if (resultCode == Activity.RESULT_OK) {
+                //Ask the service to reconnect.
+                Log.d(TAG, "Fit auth completed.  Asking for reconnect.");
+                requestFitConnection();
+
+            } else {
+                try {
+                    authInProgress = true;
+                    mFitResultResolution.startResolutionForResult(activity, REQUEST_OAUTH);
+
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG,
+                            "Activity Thread Google Fit Exception while starting resolution activity", e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        fitActivityResult(requestCode, resultCode);
+    }
+
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStatusReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitDataReceiver);
+
+        super.onDestroy();
+    }
 }

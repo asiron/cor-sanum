@@ -1,7 +1,15 @@
 package lu.uni.psod.corsanum;
 
-import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.directions.route.Route;
@@ -23,10 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import lu.uni.psod.corsanum.fragments.ControlExerciseFragment;
-import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
-import lu.uni.psod.corsanum.models.Action;
-import lu.uni.psod.corsanum.models.Exercise;
-import lu.uni.psod.corsanum.models.Position;
+import lu.uni.psod.corsanum.models.fit.Action;
+import lu.uni.psod.corsanum.models.fit.Exercise;
+import lu.uni.psod.corsanum.models.fit.Position;
+import lu.uni.psod.corsanum.services.GoogleFitService;
+import lu.uni.psod.corsanum.services.MessageType;
 
 public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback {
 
@@ -47,6 +56,7 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
+
         mMarkers = new HashMap<Integer, Marker>();
 
         mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx), 0);
@@ -59,7 +69,6 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.control_exercise_map);
 
         mMapFragment.getMapAsync(this);
-
 
     }
 
@@ -169,12 +178,20 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     }
 
     public LatLngBounds getBoundingBox() {
-
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : mMarkers.values()) {
             builder.include(marker.getPosition());
         }
-        LatLngBounds bounds = builder.build();
-        return bounds;
+        return builder.build();
     }
+
+    public int getCurrentExerciseIndex() {
+        return mCurrentExerciseIndex;
+    }
+
+    public Exercise getCurrentExercise() {
+        return mCurrentExercise;
+    }
+
+
 }

@@ -21,12 +21,11 @@ import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.daimajia.swipe.implments.SwipeItemRecyclerMangerImpl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.helpers.ExerciseHelper;
-import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.fit.Exercise;
 
 public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<ExercisesRecyclerViewAdapter.SimpleViewHolder> {
 

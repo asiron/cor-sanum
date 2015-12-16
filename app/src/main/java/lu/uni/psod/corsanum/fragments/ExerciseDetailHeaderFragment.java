@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 
@@ -23,8 +21,7 @@ import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 import lu.uni.psod.corsanum.ExerciseActivity;
 import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
-import lu.uni.psod.corsanum.models.Action;
-import lu.uni.psod.corsanum.models.Exercise;
+import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.utils.ActionsRecyclerViewAdapter;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
 
