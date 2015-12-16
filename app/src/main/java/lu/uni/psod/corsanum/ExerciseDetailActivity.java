@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
-import lu.uni.psod.corsanum.models.Action;
-import lu.uni.psod.corsanum.models.Exercise;
-import lu.uni.psod.corsanum.models.Position;
+import lu.uni.psod.corsanum.models.fit.Action;
+import lu.uni.psod.corsanum.models.fit.Exercise;
+import lu.uni.psod.corsanum.models.fit.Position;
 
 public class ExerciseDetailActivity extends BaseActivity
         implements OnMapReadyCallback, ExerciseDetailHeaderFragment.OnActionSelectedListener

@@ -1,8 +1,5 @@
 package lu.uni.psod.corsanum;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,18 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
-import com.google.gson.Gson;
 
-import lu.uni.psod.corsanum.models.Action;
-import lu.uni.psod.corsanum.models.ActionType;
-import lu.uni.psod.corsanum.models.Exercise;
-import lu.uni.psod.corsanum.models.Position;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
 import lu.uni.psod.corsanum.utils.ExercisesRecyclerViewAdapter;
 

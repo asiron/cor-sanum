@@ -4,21 +4,49 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/exercise_detail_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/exercise_title"
         android:textSize="24sp"
-        android:transitionName="@string/exc_detail_tran_name"/>
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+     />
 
+    <TextView
+        android:id="@+id/step_count"
+        android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        />
+
+
+    <TextView
+        android:id="@+id/speed"
+        android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1" />
+
+    <ToggleButton
+        android:id="@+id/start_pause_exercise"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        android:textOn="Pause"
+        android:textOff="Play" />
 
     <Button
-        android:id="@+id/start_exercise"
-        android:layout_width="match_parent"
-        android:text="@string/start_exercise"
-        android:layout_height="wrap_content" />
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/recycler_view_actions"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:id="@+id/stop_exercise"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        android:visibility="invisible"
+        android:text="@string/stop_exercise" />
+
+
 </LinearLayout>

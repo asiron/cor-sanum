@@ -1,4 +1,4 @@
-package lu.uni.psod.corsanum.models;
+package lu.uni.psod.corsanum.models.fit;
 
 /**
  * Created by asiron on 12/6/15.
@@ -12,13 +12,13 @@ public enum ActionType {
     STRETCH("Stretching"),
     UNKNOWN("Unknown action");
 
-    private final String description;
+    private final String des;
 
-    private ActionType(String value) {
-        description = value;
+    private ActionType(String d) {
+        des = d;
     }
 
     public String getName() {
-        return description;
+        return des;
     }
 }
