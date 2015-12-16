@@ -66,16 +66,8 @@ public class ControlExerciseFragment extends Fragment {
     private Button stopExerciseButton       = null;
     private ToggleButton startPauseExercise = null;
 
+    private boolean isServiceRunning = false;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ControlExerciseFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ControlExerciseFragment newInstance(String param1, String param2) {
         ControlExerciseFragment fragment = new ControlExerciseFragment();
         Bundle args = new Bundle();
@@ -146,20 +138,37 @@ public class ControlExerciseFragment extends Fragment {
     }
 
     private void startResumeExercise() {
-        requestFitConnection();
+        if (isServiceRunning) {
+            Log.i(TAG, "Service already running.");
+            return;
+        }
+        isServiceRunning = true;
+        //requestFitConnection();
+        startGoogleFitService();
     }
 
     private void pauseExercise() {
+
     }
 
     private void stopExercise() {
+        Intent service = new Intent(activity, GoogleFitService.class);
+        activity.stopService(service);
+        Log.i(TAG, "Service stopped.");
+        isServiceRunning = false;
+    }
+
+    private void startGoogleFitService() {
+        Intent service = new Intent(activity, GoogleFitService.class);
+        service.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
+        activity.startService(service);
 
     }
 
     private void requestFitConnection() {
-        Intent service = new Intent(activity, GoogleFitService.class);
-        service.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
-        activity.startService(service);
+        Intent intent = new Intent(GoogleFitService.FIT_LOGIN_LOGOUT_INTENT);
+        intent.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
     }
 
     @Override
@@ -244,20 +253,15 @@ public class ControlExerciseFragment extends Fragment {
 
     private void fitHandleConnection() {
         Toast.makeText(activity, "Fit connected", Toast.LENGTH_SHORT).show();
-        //mConnectButton.setEnabled(false);
-        //mGetStepsButton.setEnabled(true);
     }
 
     private void fitHandleFailedConnection(ConnectionResult result) {
         Log.i(TAG, "Activity Thread Google Fit Connection failed. Cause: " + result.toString());
         if (!result.hasResolution()) {
-            // Show the localized error dialog
             GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), activity, 0).show();
             return;
         }
 
-        // The failure has a resolution. Resolve it.
-        // Called typically when the app is not yet authorized, and an authorization dialog is displayed to the user.
         if (!authInProgress) {
             if (result.getErrorCode() == FitnessStatusCodes.NEEDS_OAUTH_PERMISSIONS) {
                 try {
@@ -267,11 +271,8 @@ public class ControlExerciseFragment extends Fragment {
                     Log.e(TAG, "Activity Thread Google Fit Exception while starting resolution activity", e);
                 }
             } else {
-
                 Log.i(TAG, "Activity Thread Google Fit Attempting to resolve failed connection");
-
                 mFitResultResolution = result;
-                //mConnectButton.setEnabled(true);
             }
         }
     }
@@ -280,10 +281,8 @@ public class ControlExerciseFragment extends Fragment {
         if (requestCode == REQUEST_OAUTH) {
             authInProgress = false;
             if (resultCode == Activity.RESULT_OK) {
-                //Ask the service to reconnect.
                 Log.d(TAG, "Fit auth completed.  Asking for reconnect.");
                 requestFitConnection();
-
             } else {
                 try {
                     authInProgress = true;
