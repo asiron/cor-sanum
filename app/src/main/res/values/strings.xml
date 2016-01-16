@@ -6,10 +6,12 @@
     <string name="exc_detail_tran_name">exercise_title_act_transition_name</string>
 
     <!-- Displayed strings -->
-    <string name="start_exercise">Start Exercise</string>
+    <string name="start_exercise_label">Start Exercise</string>
+    <string name="resume_exercise_label">Resume Exercise</string>
+    <string name="pause_exercise_label">Pause Exercise</string>
+    <string name="stop_exercise_label">Stop Exercise</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="stop_exercise">Stop</string>
 
 </resources>

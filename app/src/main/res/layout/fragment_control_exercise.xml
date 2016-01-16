@@ -36,8 +36,8 @@
         android:layout_height="0dp"
         android:layout_gravity="top"
         android:layout_weight="1"
-        android:textOn="Pause"
-        android:textOff="Play" />
+        android:textOn="@string/pause_exercise_label"
+        android:textOff="@string/start_exercise_label" />
 
     <Button
         android:id="@+id/stop_exercise"
@@ -46,7 +46,7 @@
         android:layout_gravity="top"
         android:layout_weight="1"
         android:visibility="invisible"
-        android:text="@string/stop_exercise" />
+        android:text="@string/stop_exercise_label" />
 
 
 </LinearLayout>
