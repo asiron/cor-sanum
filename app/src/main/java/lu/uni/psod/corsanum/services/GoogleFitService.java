@@ -172,7 +172,7 @@ public class GoogleFitService extends Service {
                     //Wait until the service either connects or fails to connect
                     while (mTryingToConnect) {
                         try {
-                            Thread.sleep(100, 0);
+                            Thread.sleep(10000, 0);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

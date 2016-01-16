@@ -149,7 +149,7 @@ public class LoginActivity extends Activity {
             }
         });
 
-        buildFitnessClient();
+        //buildFitnessClient();
     }
     // [END auth_oncreate_setup_ending]
 
@@ -233,15 +233,16 @@ public class LoginActivity extends Activity {
         super.onStart();
         // Connect to the Fitness API
         Log.i(TAG, "Connecting...");
-        mClient.connect();
+        //mClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mClient.isConnected()) {
+        /*if (mClient.isConnected()) {
             mClient.disconnect();
         }
+        */
     }
 
     @Override
