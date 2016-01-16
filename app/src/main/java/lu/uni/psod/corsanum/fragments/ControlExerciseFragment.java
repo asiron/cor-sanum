@@ -263,21 +263,17 @@ public class ControlExerciseFragment extends Fragment {
         }
 
         if (!authInProgress) {
-            if (result.getErrorCode() == FitnessStatusCodes.NEEDS_OAUTH_PERMISSIONS) {
-                try {
-                    Log.d(TAG, "Google Fit connection failed with OAuth failure.  Trying to ask for consent (again)");
-                    result.startResolutionForResult(activity, REQUEST_OAUTH);
-                } catch (IntentSender.SendIntentException e) {
-                    Log.e(TAG, "Activity Thread Google Fit Exception while starting resolution activity", e);
-                }
-            } else {
-                Log.i(TAG, "Activity Thread Google Fit Attempting to resolve failed connection");
-                mFitResultResolution = result;
+            try {
+                Log.d(TAG, "Google Fit connection failed with OAuth failure.  Trying to ask for consent (again)");
+                result.startResolutionForResult(activity, REQUEST_OAUTH);
+            } catch (IntentSender.SendIntentException e) {
+                Log.e(TAG, "Activity Thread Google Fit Exception while starting resolution activity", e);
             }
         }
     }
 
     private void fitActivityResult(int requestCode, int resultCode) {
+        Log.i(TAG, "Inside fit actiity result");
         if (requestCode == REQUEST_OAUTH) {
             authInProgress = false;
             if (resultCode == Activity.RESULT_OK) {
@@ -289,8 +285,7 @@ public class ControlExerciseFragment extends Fragment {
                     mFitResultResolution.startResolutionForResult(activity, REQUEST_OAUTH);
 
                 } catch (IntentSender.SendIntentException e) {
-                    Log.e(TAG,
-                            "Activity Thread Google Fit Exception while starting resolution activity", e);
+                    Log.e(TAG, "Activity Thread Google Fit Exception while starting resolution activity", e);
                 }
             }
         }
@@ -305,7 +300,6 @@ public class ControlExerciseFragment extends Fragment {
     public void onDestroy() {
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStatusReceiver);
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitDataReceiver);
-
         super.onDestroy();
     }
 }
