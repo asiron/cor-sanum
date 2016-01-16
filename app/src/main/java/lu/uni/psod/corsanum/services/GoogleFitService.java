@@ -1,52 +1,58 @@
 package lu.uni.psod.corsanum.services;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSource;
+import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.Value;
+import com.google.android.gms.fitness.request.DataSourcesRequest;
+import com.google.android.gms.fitness.request.OnDataPointListener;
+import com.google.android.gms.fitness.request.SensorRequest;
+import com.google.android.gms.fitness.result.DataSourcesResult;
+
+import java.util.concurrent.TimeUnit;
 
 public class GoogleFitService extends Service {
 
     public static final String TAG = "GoogleFitService";
 
     private GoogleApiClient mGoogleApiFitnessClient;
+    private OnDataPointListener mDataPointListener;
+
     private boolean mTryingToConnect = false;
 
     public static final String SERVICE_REQUEST_TYPE = "requestType";
-
     public static final int TYPE_REQUEST_CONNECTION = 2;
 
     public static final String HISTORY_INTENT = "fitHistory";
     public static final String HISTORY_EXTRA_STEPS_TODAY = "stepsToday";
 
     public static final String FIT_NOTIFY_INTENT = "fitStatusUpdateIntent";
-    public static final String FIT_LOGIN_LOGOUT_INTENT = "fitLoginLogoutIntent";
+    public static final String FIT_LOGIN_INTENT = "fitLoginIntent";
     public static final String FIT_EXTRA_CONNECTION_MESSAGE = "fitFirstConnection";
     public static final String FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE = "fitExtraFailedStatusCode";
     public static final String FIT_EXTRA_NOTIFY_FAILED_INTENT = "fitExtraFailedIntent";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handleLoginLogout(intent);
+        handleLogin(intent);
         return START_STICKY;
     }
 
@@ -59,12 +65,12 @@ public class GoogleFitService extends Service {
     public void onDestroy() {
         Log.d(TAG, "GoogleFitService destroyed");
         if (mGoogleApiFitnessClient.isConnected()) {
-            Log.d(TAG, "Disconecting Google Fit.");
+            Log.d(TAG, "Disconnecting Google Fit.");
             mGoogleApiFitnessClient.disconnect();
         }
 
-        Log.i(TAG, "Unregistering login/logout request reciever");
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFitLoginLogoutRequestReceiver);
+        Log.i(TAG, "Unregistering login request receiver");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFitLoginRequestReceiver);
 
         super.onDestroy();
     }
@@ -76,7 +82,7 @@ public class GoogleFitService extends Service {
         Log.d(TAG, "GoogleFitService created");
         LocalBroadcastManager
                 .getInstance(this)
-                .registerReceiver(mFitLoginLogoutRequestReceiver, new IntentFilter(GoogleFitService.FIT_LOGIN_LOGOUT_INTENT));
+                .registerReceiver(mFitLoginRequestReceiver, new IntentFilter(GoogleFitService.FIT_LOGIN_INTENT));
     }
 
     public void connectGoogleFit() {
@@ -89,7 +95,7 @@ public class GoogleFitService extends Service {
             //Wait until the service either connects or fails to connect
             while (mTryingToConnect) {
                 try {
-                    Thread.sleep(100, 0);
+                    Thread.sleep(2000, 0);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -113,6 +119,9 @@ public class GoogleFitService extends Service {
                                 mTryingToConnect = false;
                                 Log.d(TAG, "Notifying the UI that we're connected.");
                                 notifyUiFitConnected();
+
+                                findFitnessDataSources();
+
                             }
 
                             @Override
@@ -154,41 +163,118 @@ public class GoogleFitService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void handleLoginLogout(Intent intent) {
+    private void handleLogin(Intent intent) {
         Log.i(TAG, "Received login/logout intent");
-
-        int type = intent.getIntExtra(SERVICE_REQUEST_TYPE, -1);
-
-        Thread task = new Thread()
-        {
+        new Thread(new Runnable() {
             @Override
             public void run()
             {
-                //block until google fit connects.  Give up after 10 seconds.
-                if (!mGoogleApiFitnessClient.isConnected()) {
-                    mTryingToConnect = true;
-                    mGoogleApiFitnessClient.connect();
+                connectGoogleFit();
+            }
+        }).start();
+    }
 
-                    //Wait until the service either connects or fails to connect
-                    while (mTryingToConnect) {
-                        try {
-                            Thread.sleep(10000, 0);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+    private BroadcastReceiver mFitLoginRequestReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handleLogin(intent);
+        }
+    };
+
+    private void findFitnessDataSources() {
+        // [START find_data_sources]
+        Fitness.SensorsApi.findDataSources(mGoogleApiFitnessClient, new DataSourcesRequest.Builder()
+                // At least one datatype must be specified.
+                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE)
+                        // Can specify whether data type is raw or derived.
+                .setDataSourceTypes(DataSource.TYPE_RAW)
+                .build())
+                .setResultCallback(new ResultCallback<DataSourcesResult>() {
+                    @Override
+                    public void onResult(DataSourcesResult dataSourcesResult) {
+                        Log.i(TAG, "Result: " + dataSourcesResult.getStatus().toString());
+                        for (DataSource dataSource : dataSourcesResult.getDataSources()) {
+                            Log.i(TAG, "Data source found: " + dataSource.toString());
+                            Log.i(TAG, "Data Source type: " + dataSource.getDataType().getName());
+
+                            //Let's register a listener to receive Activity data!
+                            if (dataSource.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)
+                                    && mDataPointListener == null) {
+                                Log.i(TAG, "Data source for LOCATION_SAMPLE found!  Registering.");
+                                registerFitnessDataListener(dataSource,
+                                        DataType.TYPE_LOCATION_SAMPLE);
+                            }
                         }
                     }
+                });
+        // [END find_data_sources]
+    }
+
+    /**
+     * Register a listener with the Sensors API for the provided {@link DataSource} and
+     * {@link DataType} combo.
+     */
+    private void registerFitnessDataListener(DataSource dataSource, DataType dataType) {
+        // [START register_data_listener]
+        mDataPointListener = new OnDataPointListener() {
+            @Override
+            public void onDataPoint(DataPoint dataPoint) {
+                for (Field field : dataPoint.getDataType().getFields()) {
+                    Value val = dataPoint.getValue(field);
+                    Log.i(TAG, "Detected DataPoint field: " + field.getName());
+                    Log.i(TAG, "Detected DataPoint value: " + val);
                 }
             }
         };
-        task.start();
+
+        Fitness.SensorsApi.add(
+                mGoogleApiFitnessClient,
+                new SensorRequest.Builder()
+                        .setDataSource(dataSource) // Optional but recommended for custom data sets.
+                        .setDataType(dataType) // Can't be omitted.
+                        .setSamplingRate(1, TimeUnit.SECONDS)
+                        .build(),
+                mDataPointListener)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if (status.isSuccess()) {
+                            Log.i(TAG, "Listener registered!");
+                        } else {
+                            Log.i(TAG, "Listener not registered.");
+                        }
+                    }
+                });
+        // [END register_data_listener]
     }
 
-    private BroadcastReceiver mFitLoginLogoutRequestReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            handleLoginLogout(intent);
-
+    /**
+     * Unregister the listener with the Sensors API.
+     */
+    private void unregisterFitnessDataListener() {
+        if (mDataPointListener == null) {
+            // This code only activates one listener at a time.  If there's no listener, there's
+            // nothing to unregister.
+            return;
         }
-    };
+
+        // [START unregister_data_listener]
+        // Waiting isn't actually necessary as the unregister call will complete regardless,
+        // even if called from within onStop, but a callback can still be added in order to
+        // inspect the results.
+        Fitness.SensorsApi.remove(
+                mGoogleApiFitnessClient,
+                mDataPointListener)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if (status.isSuccess()) {
+                            Log.i(TAG, "Listener was removed!");
+                        } else {
+                            Log.i(TAG, "Listener was not removed.");
+                        }
+                    }
+                });
+        // [END unregister_data_listener]
+    }
 }

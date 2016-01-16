@@ -22,10 +22,8 @@ import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.fitness.FitnessStatusCodes;
 
 import lu.uni.psod.corsanum.ExerciseActivity;
-import lu.uni.psod.corsanum.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.services.GoogleFitService;
 
@@ -63,10 +61,10 @@ public class ControlExerciseFragment extends Fragment {
     private TextView stepCountTextView = null;
     private TextView speedTextView     = null;
 
-    private Button stopExerciseButton       = null;
-    private ToggleButton startPauseExercise = null;
+    private Button stopExerciseButton = null;
+    private ToggleButton startPauseExerciseButton = null;
 
-    private boolean isServiceRunning = false;
+    private boolean isExerciseRunning = false;
 
     public static ControlExerciseFragment newInstance(String param1, String param2) {
         ControlExerciseFragment fragment = new ControlExerciseFragment();
@@ -99,23 +97,21 @@ public class ControlExerciseFragment extends Fragment {
         stepCountTextView  = (TextView) activity.findViewById(R.id.step_count);
         speedTextView      = (TextView) activity.findViewById(R.id.speed);
         stopExerciseButton = (Button) activity.findViewById(R.id.stop_exercise);
-        startPauseExercise = (ToggleButton) activity.findViewById(R.id.start_pause_exercise);
+        startPauseExerciseButton = (ToggleButton) activity.findViewById(R.id.start_pause_exercise);
         exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_title);
 
         exerciseTitleTextView.setText(activity.getCurrentExercise().getExerciseName());
 
-        startPauseExercise.setOnClickListener(new View.OnClickListener() {
+        startPauseExerciseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean on = ((ToggleButton) v).isChecked();
                 if (on) {
                     Log.i(TAG, "Starting/Resuming exercise");
-                    stopExerciseButton.setVisibility(View.VISIBLE);
                     startResumeExercise();
 
                 } else {
                     Log.i(TAG, "Pausing exercise");
-                    stopExerciseButton.setVisibility(View.VISIBLE);
                     pauseExercise();
                 }
             }
@@ -138,24 +134,31 @@ public class ControlExerciseFragment extends Fragment {
     }
 
     private void startResumeExercise() {
-        if (isServiceRunning) {
-            Log.i(TAG, "Service already running.");
-            return;
+        if (isExerciseRunning) {
+            Log.i(TAG, "Resuming exercise.");
+        } else {
+            Log.i(TAG, "Starting new exercise.");
+            startPauseExerciseButton.setTextOff(activity.getResources().getString(R.string.resume_exercise_label));
+            stopExerciseButton.setVisibility(View.VISIBLE);
+
+            startGoogleFitService();
         }
-        isServiceRunning = true;
-        //requestFitConnection();
-        startGoogleFitService();
     }
 
     private void pauseExercise() {
-
+        // TODO handle
     }
 
     private void stopExercise() {
         Intent service = new Intent(activity, GoogleFitService.class);
         activity.stopService(service);
         Log.i(TAG, "Service stopped.");
-        isServiceRunning = false;
+
+        isExerciseRunning = false;
+        stopExerciseButton.setVisibility(View.INVISIBLE);
+        startPauseExerciseButton.setTextOff(activity.getResources().getString(R.string.start_exercise_label));
+        startPauseExerciseButton.setChecked(false);
+        Log.i(TAG, "Exercise stopped.");
     }
 
     private void startGoogleFitService() {
@@ -166,7 +169,7 @@ public class ControlExerciseFragment extends Fragment {
     }
 
     private void requestFitConnection() {
-        Intent intent = new Intent(GoogleFitService.FIT_LOGIN_LOGOUT_INTENT);
+        Intent intent = new Intent(GoogleFitService.FIT_LOGIN_INTENT);
         intent.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
         LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
     }
