@@ -95,7 +95,7 @@ public class GoogleFitService extends Service {
             //Wait until the service either connects or fails to connect
             while (mTryingToConnect) {
                 try {
-                    Thread.sleep(2000, 0);
+                    Thread.sleep(20000, 0);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -182,12 +182,12 @@ public class GoogleFitService extends Service {
     };
 
     private void findFitnessDataSources() {
-        // [START find_data_sources]
         Fitness.SensorsApi.findDataSources(mGoogleApiFitnessClient, new DataSourcesRequest.Builder()
+
                 // At least one datatype must be specified.
-                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE)
+                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE, DataType.TYPE_STEP_COUNT_CUMULATIVE)
                         // Can specify whether data type is raw or derived.
-                .setDataSourceTypes(DataSource.TYPE_RAW)
+                //.setDataSourceTypes(DataSource.TYPE_DERIVED)
                 .build())
                 .setResultCallback(new ResultCallback<DataSourcesResult>() {
                     @Override
@@ -199,21 +199,24 @@ public class GoogleFitService extends Service {
 
                             //Let's register a listener to receive Activity data!
                             if (dataSource.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)
-                                    && mDataPointListener == null) {
+                                    ) {
                                 Log.i(TAG, "Data source for LOCATION_SAMPLE found!  Registering.");
                                 registerFitnessDataListener(dataSource,
                                         DataType.TYPE_LOCATION_SAMPLE);
                             }
+
+                            if (dataSource.getDataType().equals(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                                    ) {
+                                Log.i(TAG, "Data source for STEP_COUNT_CUMULATIVE found!  Registering.");
+                                registerFitnessDataListener(dataSource,
+                                        DataType.TYPE_STEP_COUNT_CUMULATIVE);
+                            }
+
                         }
                     }
                 });
-        // [END find_data_sources]
     }
 
-    /**
-     * Register a listener with the Sensors API for the provided {@link DataSource} and
-     * {@link DataType} combo.
-     */
     private void registerFitnessDataListener(DataSource dataSource, DataType dataType) {
         // [START register_data_listener]
         mDataPointListener = new OnDataPointListener() {
@@ -232,7 +235,7 @@ public class GoogleFitService extends Service {
                 new SensorRequest.Builder()
                         .setDataSource(dataSource) // Optional but recommended for custom data sets.
                         .setDataType(dataType) // Can't be omitted.
-                        .setSamplingRate(1, TimeUnit.SECONDS)
+                        .setSamplingRate(100, TimeUnit.MILLISECONDS)
                         .build(),
                 mDataPointListener)
                 .setResultCallback(new ResultCallback<Status>() {
@@ -245,12 +248,8 @@ public class GoogleFitService extends Service {
                         }
                     }
                 });
-        // [END register_data_listener]
     }
 
-    /**
-     * Unregister the listener with the Sensors API.
-     */
     private void unregisterFitnessDataListener() {
         if (mDataPointListener == null) {
             // This code only activates one listener at a time.  If there's no listener, there's
@@ -258,7 +257,6 @@ public class GoogleFitService extends Service {
             return;
         }
 
-        // [START unregister_data_listener]
         // Waiting isn't actually necessary as the unregister call will complete regardless,
         // even if called from within onStop, but a callback can still be added in order to
         // inspect the results.
@@ -275,6 +273,5 @@ public class GoogleFitService extends Service {
                         }
                     }
                 });
-        // [END unregister_data_listener]
     }
 }
