@@ -21,7 +21,6 @@
         android:layout_weight="1"
         />
 
-
     <TextView
         android:id="@+id/speed"
         android:textSize="24sp"

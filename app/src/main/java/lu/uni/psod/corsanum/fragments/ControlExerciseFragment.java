@@ -27,27 +27,10 @@ import lu.uni.psod.corsanum.ExerciseActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.services.GoogleFitService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ControlExerciseFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ControlExerciseFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ControlExerciseFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TAG = "ControlExerciseFragment";
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    private static final String IS_EXERCISE_RUNNING = "exercise_running";
 
     private ExerciseActivity activity = null;
 
@@ -66,31 +49,25 @@ public class ControlExerciseFragment extends Fragment {
 
     private boolean isExerciseRunning = false;
 
-    public static ControlExerciseFragment newInstance(String param1, String param2) {
-        ControlExerciseFragment fragment = new ControlExerciseFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public ControlExerciseFragment() {
-        // Required empty public constructor
-    }
+    public ControlExerciseFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(IS_EXERCISE_RUNNING, isExerciseRunning);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null)
+            isExerciseRunning = savedInstanceState.getBoolean(IS_EXERCISE_RUNNING, false);
 
         activity = (ExerciseActivity) getActivity();
 
@@ -165,7 +142,6 @@ public class ControlExerciseFragment extends Fragment {
         Intent service = new Intent(activity, GoogleFitService.class);
         service.putExtra(GoogleFitService.SERVICE_REQUEST_TYPE, GoogleFitService.TYPE_REQUEST_CONNECTION);
         activity.startService(service);
-
     }
 
     private void requestFitConnection() {
@@ -175,50 +151,19 @@ public class ControlExerciseFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_control_exercise, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        /*try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
     }
 
     private BroadcastReceiver mFitDataReceiver = new BroadcastReceiver() {
@@ -237,10 +182,10 @@ public class ControlExerciseFragment extends Fragment {
     private BroadcastReceiver mFitStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
+
             if (intent.hasExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE) &&
                     intent.hasExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE)) {
-                //Recreate the connection result
+
                 int statusCode = intent.getIntExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE, 0);
                 PendingIntent pendingIntent = intent.getParcelableExtra(GoogleFitService.FIT_EXTRA_NOTIFY_FAILED_INTENT);
                 ConnectionResult result = new ConnectionResult(statusCode, pendingIntent);
@@ -255,7 +200,7 @@ public class ControlExerciseFragment extends Fragment {
     };
 
     private void fitHandleConnection() {
-        Toast.makeText(activity, "Fit connected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "GoogleFit connected", Toast.LENGTH_SHORT).show();
     }
 
     private void fitHandleFailedConnection(ConnectionResult result) {
