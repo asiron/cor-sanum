@@ -106,7 +106,10 @@ public class ControlExerciseFragment extends Fragment {
                 .registerReceiver(mFitStatusReceiver, new IntentFilter(GoogleFitService.FIT_NOTIFY_INTENT));
         LocalBroadcastManager
                 .getInstance(activity)
-                .registerReceiver(mFitDataReceiver, new IntentFilter(GoogleFitService.HISTORY_INTENT));
+                .registerReceiver(mFitStepsDataReceiver, new IntentFilter(GoogleFitService.FIT_STEPS_DATA_INTENT));
+        LocalBroadcastManager
+                .getInstance(activity)
+                .registerReceiver(mFitLocationDataReceiver, new IntentFilter(GoogleFitService.FIT_LOCATION_DATA_INTENT));
 
     }
 
@@ -166,14 +169,25 @@ public class ControlExerciseFragment extends Fragment {
         super.onDetach();
     }
 
-    private BroadcastReceiver mFitDataReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mFitStepsDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            if (intent.hasExtra(GoogleFitService.HISTORY_EXTRA_STEPS_TODAY)) {
+            if (intent.hasExtra(GoogleFitService.FIT_STEPS_DATA_EXTRA_STEPS)) {
+                final int totalSteps = intent.getIntExtra(GoogleFitService.FIT_STEPS_DATA_EXTRA_STEPS, 0);
+                stepCountTextView.setText(activity.getResources().getString(R.string.step_count) + String.valueOf(totalSteps));
+            }
+        }
+    };
 
-                final int totalSteps = intent.getIntExtra(GoogleFitService.HISTORY_EXTRA_STEPS_TODAY, 0);
-                Toast.makeText(activity, "Total Steps: " + totalSteps, Toast.LENGTH_SHORT).show();
+    private BroadcastReceiver mFitLocationDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LAT) &&
+                    intent.hasExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LONG))
+            {
+                float latitude  = intent.getIntExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LAT, 0);
+                float longitude = intent.getIntExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LONG, 0);
+
 
             }
         }
@@ -247,7 +261,7 @@ public class ControlExerciseFragment extends Fragment {
     @Override
     public void onDestroy() {
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStatusReceiver);
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitDataReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStepsDataReceiver);
         super.onDestroy();
     }
 }

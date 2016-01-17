@@ -34,9 +34,10 @@ public class GoogleFitService extends Service {
     public static final String TAG = "GoogleFitService";
 
     private GoogleApiClient mGoogleApiFitnessClient;
-    private OnDataPointListener mDataPointListener;
 
     private boolean mTryingToConnect = false;
+
+    private int mInitialStepCount = -1;
 
     public static final String SERVICE_REQUEST_TYPE = "requestType";
     public static final int TYPE_REQUEST_CONNECTION = 2;
@@ -44,11 +45,60 @@ public class GoogleFitService extends Service {
     public static final String HISTORY_INTENT = "fitHistory";
     public static final String HISTORY_EXTRA_STEPS_TODAY = "stepsToday";
 
+    public static final String FIT_LOCATION_DATA_INTENT = "fitLocationDataIntent";
+    public static final String FIT_LOCATION_DATA_EXTRA_LAT = "fitLocationDataLatitude";
+    public static final String FIT_LOCATION_DATA_EXTRA_LONG = "fitLocationDataLongitude";
+
+    public static final String FIT_STEPS_DATA_INTENT = "fitStepsDataIntent";
+    public static final String FIT_STEPS_DATA_EXTRA_STEPS = "fitStepsDataSteps";
+
     public static final String FIT_NOTIFY_INTENT = "fitStatusUpdateIntent";
     public static final String FIT_LOGIN_INTENT = "fitLoginIntent";
     public static final String FIT_EXTRA_CONNECTION_MESSAGE = "fitFirstConnection";
     public static final String FIT_EXTRA_NOTIFY_FAILED_STATUS_CODE = "fitExtraFailedStatusCode";
     public static final String FIT_EXTRA_NOTIFY_FAILED_INTENT = "fitExtraFailedIntent";
+
+    private OnDataPointListener mLocationDataPointListener = new OnDataPointListener() {
+        @Override
+        public void onDataPoint(DataPoint dataPoint) {
+            float longitude = 0, latitude = 0;
+
+            for (Field field : dataPoint.getDataType().getFields()) {
+                Value val = dataPoint.getValue(field);
+                try {
+                    if (field.getName().equals("longitude")) {
+                        Log.i(TAG, "Received Longitude value from GoogleFit: " + val.asFloat());
+                        longitude = val.asFloat();
+
+                    } else if (field.getName().equals("latitude")) {
+                        Log.i(TAG, "Received Latitude value from GoogleFit: " + val.asFloat());
+                        latitude = val.asFloat();
+                    }
+                } catch (IllegalStateException e) {
+                    Log.i(TAG, "Exception when receiving data point" + e.getMessage());
+                    return;
+                }
+            }
+
+            notifyUiFitLocationData(latitude, longitude);
+        }
+    };
+
+    private OnDataPointListener mStepsDataPointListener = new OnDataPointListener() {
+        @Override
+        public void onDataPoint(DataPoint dataPoint) {
+            for (Field field : dataPoint.getDataType().getFields()) {
+                if (field.getName().equals("steps")) {
+                    int currentSteps = dataPoint.getValue(field).asInt();
+                    if (mInitialStepCount == -1) {
+                        mInitialStepCount = currentSteps;
+                    }
+                    notifyUiFitStepsData(currentSteps - mInitialStepCount);
+                    Log.i(TAG, "Received Steps from GoogleFit: " + String.valueOf(currentSteps - mInitialStepCount));
+                }
+            }
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -66,6 +116,8 @@ public class GoogleFitService extends Service {
         Log.d(TAG, "GoogleFitService destroyed");
         if (mGoogleApiFitnessClient.isConnected()) {
             Log.d(TAG, "Disconnecting Google Fit.");
+            unregisterFitnessDataListener("steps", mStepsDataPointListener);
+            unregisterFitnessDataListener("location", mLocationDataPointListener);
             mGoogleApiFitnessClient.disconnect();
         }
 
@@ -87,12 +139,10 @@ public class GoogleFitService extends Service {
 
     public void connectGoogleFit() {
 
-        //block until google fit connects.  Give up after 10 seconds.
         if (!mGoogleApiFitnessClient.isConnected()) {
             mTryingToConnect = true;
             mGoogleApiFitnessClient.connect();
 
-            //Wait until the service either connects or fails to connect
             while (mTryingToConnect) {
                 try {
                     Thread.sleep(20000, 0);
@@ -104,7 +154,6 @@ public class GoogleFitService extends Service {
     }
 
     private void buildFitnessClient() {
-        // Create the Google API Client
         mGoogleApiFitnessClient = new GoogleApiClient.Builder(this)
                 .addApi(Fitness.SENSORS_API)
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
@@ -119,9 +168,7 @@ public class GoogleFitService extends Service {
                                 mTryingToConnect = false;
                                 Log.d(TAG, "Notifying the UI that we're connected.");
                                 notifyUiFitConnected();
-
                                 findFitnessDataSources();
-
                             }
 
                             @Override
@@ -163,6 +210,19 @@ public class GoogleFitService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private void notifyUiFitLocationData(float latitude, float longitude) {
+        Intent intent = new Intent(FIT_LOCATION_DATA_INTENT);
+        intent.putExtra(FIT_LOCATION_DATA_EXTRA_LAT, latitude);
+        intent.putExtra(FIT_LOCATION_DATA_EXTRA_LONG, longitude);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void notifyUiFitStepsData(int steps) {
+        Intent intent = new Intent(FIT_STEPS_DATA_INTENT);
+        intent.putExtra(FIT_STEPS_DATA_EXTRA_STEPS, steps);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     private void handleLogin(Intent intent) {
         Log.i(TAG, "Received login/logout intent");
         new Thread(new Runnable() {
@@ -183,33 +243,35 @@ public class GoogleFitService extends Service {
 
     private void findFitnessDataSources() {
         Fitness.SensorsApi.findDataSources(mGoogleApiFitnessClient, new DataSourcesRequest.Builder()
-
-                // At least one datatype must be specified.
-                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE, DataType.TYPE_STEP_COUNT_CUMULATIVE)
-                        // Can specify whether data type is raw or derived.
-                //.setDataSourceTypes(DataSource.TYPE_DERIVED)
+                .setDataTypes(
+                        DataType.TYPE_LOCATION_SAMPLE,
+                        DataType.TYPE_STEP_COUNT_CUMULATIVE)
                 .build())
                 .setResultCallback(new ResultCallback<DataSourcesResult>() {
                     @Override
                     public void onResult(DataSourcesResult dataSourcesResult) {
                         Log.i(TAG, "Result: " + dataSourcesResult.getStatus().toString());
                         for (DataSource dataSource : dataSourcesResult.getDataSources()) {
+
                             Log.i(TAG, "Data source found: " + dataSource.toString());
                             Log.i(TAG, "Data Source type: " + dataSource.getDataType().getName());
 
                             //Let's register a listener to receive Activity data!
-                            if (dataSource.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)
-                                    ) {
+                            if (dataSource.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
                                 Log.i(TAG, "Data source for LOCATION_SAMPLE found!  Registering.");
-                                registerFitnessDataListener(dataSource,
-                                        DataType.TYPE_LOCATION_SAMPLE);
+                                registerFitnessDataListener(
+                                        dataSource,
+                                        DataType.TYPE_LOCATION_SAMPLE,
+                                        mLocationDataPointListener
+                                );
                             }
 
-                            if (dataSource.getDataType().equals(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-                                    ) {
+                            if (dataSource.getDataType().equals(DataType.TYPE_STEP_COUNT_CUMULATIVE)) {
                                 Log.i(TAG, "Data source for STEP_COUNT_CUMULATIVE found!  Registering.");
-                                registerFitnessDataListener(dataSource,
-                                        DataType.TYPE_STEP_COUNT_CUMULATIVE);
+                                registerFitnessDataListener(
+                                        dataSource,
+                                        DataType.TYPE_STEP_COUNT_CUMULATIVE,
+                                        mStepsDataPointListener);
                             }
 
                         }
@@ -217,59 +279,42 @@ public class GoogleFitService extends Service {
                 });
     }
 
-    private void registerFitnessDataListener(DataSource dataSource, DataType dataType) {
-        // [START register_data_listener]
-        mDataPointListener = new OnDataPointListener() {
-            @Override
-            public void onDataPoint(DataPoint dataPoint) {
-                for (Field field : dataPoint.getDataType().getFields()) {
-                    Value val = dataPoint.getValue(field);
-                    Log.i(TAG, "Detected DataPoint field: " + field.getName());
-                    Log.i(TAG, "Detected DataPoint value: " + val);
-                }
-            }
-        };
-
+    private void registerFitnessDataListener(DataSource dataSource, final DataType dataType, OnDataPointListener listener) {
         Fitness.SensorsApi.add(
                 mGoogleApiFitnessClient,
                 new SensorRequest.Builder()
-                        .setDataSource(dataSource) // Optional but recommended for custom data sets.
-                        .setDataType(dataType) // Can't be omitted.
-                        .setSamplingRate(100, TimeUnit.MILLISECONDS)
+                        .setDataSource(dataSource)
+                        .setDataType(dataType)
+                        .setSamplingRate(1, TimeUnit.SECONDS)
                         .build(),
-                mDataPointListener)
+                listener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
-                            Log.i(TAG, "Listener registered!");
+                            Log.i(TAG, "Lisener for " + dataType + "registered!");
                         } else {
-                            Log.i(TAG, "Listener not registered.");
+                            Log.i(TAG, "Listener for " + dataType + "not registered.");
                         }
                     }
                 });
     }
 
-    private void unregisterFitnessDataListener() {
-        if (mDataPointListener == null) {
-            // This code only activates one listener at a time.  If there's no listener, there's
-            // nothing to unregister.
+    private void unregisterFitnessDataListener(final String listenerName, OnDataPointListener listener) {
+        if (listener == null) {
             return;
         }
 
-        // Waiting isn't actually necessary as the unregister call will complete regardless,
-        // even if called from within onStop, but a callback can still be added in order to
-        // inspect the results.
         Fitness.SensorsApi.remove(
                 mGoogleApiFitnessClient,
-                mDataPointListener)
+                listener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
-                            Log.i(TAG, "Listener was removed!");
+                            Log.i(TAG, "Listener " + listenerName + " was removed!");
                         } else {
-                            Log.i(TAG, "Listener was not removed.");
+                            Log.i(TAG, "Listener " + listenerName + " was not removed.");
                         }
                     }
                 });
