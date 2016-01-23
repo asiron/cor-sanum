@@ -52,14 +52,14 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
     //private HashMap<Exercise, Integer> mExerciseList;
 
-    private ArrayList<Exercise> mExerciseList;
+    private ObservableList<Exercise> mExerciseList;
 
     //private ArrayList<Exercise> mExerciseList;
     private ArrayList<Exercise> mFilteredExerciseList;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
-    public ExercisesRecyclerViewAdapter(Context context, ArrayList<Exercise> objects) {
+    public ExercisesRecyclerViewAdapter(Context context, ObservableList<Exercise> objects) {
         this.mContext = context;
         this.mExerciseList = objects;
     /*
@@ -151,7 +151,7 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
         return R.id.swipe;
     }
 
-    public void updateDataset(ArrayList<Exercise> mExerciseList) {
+    public void updateDataset(ObservableList<Exercise> mExerciseList) {
         this.mExerciseList = mExerciseList;
     }
 

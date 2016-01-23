@@ -39,8 +39,6 @@ public class    ExerciseDetailActivity extends BaseActivity
     private MapFragment mMapFragment                     = null;
     private ExerciseDetailHeaderFragment mHeaderFragment = null;
 
-    private HashMap<Integer, Marker> mMarkers;
-
     private GoogleMap mMap = null;
 
     private MapDecorator md = null;
@@ -59,7 +57,6 @@ public class    ExerciseDetailActivity extends BaseActivity
         mMapFragment = (MapFragment) getFragmentManager()
                         .findFragmentById(R.id.exercise_detail_map);
 
-        mMarkers = new HashMap<>() ;
 
         mMapFragment.getMapAsync(this);
     }
@@ -67,7 +64,6 @@ public class    ExerciseDetailActivity extends BaseActivity
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-
         md = new MapDecorator(this, mMap, mCurrentExercise.getActions());
         md.initMapDecorator();
     }

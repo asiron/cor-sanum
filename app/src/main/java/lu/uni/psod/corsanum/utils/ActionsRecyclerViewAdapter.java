@@ -53,16 +53,16 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
     }
 
     private ExerciseDetailHeaderFragment mContext;
-    private ArrayList<Action> mDataset;
+    private ObservableList<Action> mDataset;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
 
-    public ActionsRecyclerViewAdapter(ExerciseDetailHeaderFragment context, ArrayList<Action> objects) {
+    public ActionsRecyclerViewAdapter(ExerciseDetailHeaderFragment context, ObservableList<Action> objects) {
         this.mContext = context;
         this.mDataset = objects;
     }
 
-    public void updateDataset(ArrayList<Action> objects) {
+    public void updateDataset(ObservableList<Action> objects) {
         this.mDataset = objects;
     }
 

@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.models.fit.Action;
+import lu.uni.psod.corsanum.utils.ObservableList;
 
 /**
  * Created by asiron on 12/6/15.
@@ -15,18 +16,18 @@ public class Exercise {
     private String mExerciseName;
 
     @SerializedName("actions")
-    private ArrayList<Action> mActions;
+    private ObservableList<Action> mActions;
 
     public Exercise() {
         this("");
     }
 
     public Exercise(String mExerciseName) {
-        this.mActions = new ArrayList<Action>();
+        this.mActions = new ObservableList<Action>();
         this.mExerciseName = mExerciseName;
     }
 
-    public ArrayList<Action> getActions() {
+    public ObservableList<Action> getActions() {
         return mActions;
     }
 

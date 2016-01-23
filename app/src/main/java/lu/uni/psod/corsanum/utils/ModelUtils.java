@@ -20,7 +20,7 @@ public class ModelUtils {
 
     private static final String TAG = "ModelUtils";
     private static final Gson GSON = new Gson();
-    private static final Type EXERCISE_LIST_TYPE = new TypeToken<ArrayList<Exercise>>(){}.getType();
+    private static final Type EXERCISE_LIST_TYPE = new TypeToken<ObservableList<Exercise>>(){}.getType();
 
     public static String getSavedData(Context ctx, String key) {
         Log.i(TAG, "Trying to retrieve value for key: " + key);
@@ -38,14 +38,15 @@ public class ModelUtils {
         editor.commit();
     }
 
-    public static void saveExercises(Context ctx, ArrayList<Exercise> exercises) {
+    public static void saveExercises(Context ctx, ObservableList<Exercise> exercises) {
         Log.i(TAG, "Saving exercises");
         saveData(ctx, ctx.getString(R.string.saved_exercise_list), GSON.toJson(exercises));
     }
 
-    public static ArrayList<Exercise> loadExercises(Context ctx) {
+    public static ObservableList<Exercise> loadExercises(Context ctx) {
         Log.i(TAG, "Loading exercises");
-        return (ArrayList <Exercise>) GSON.fromJson(
+
+        return (ObservableList < Exercise >) GSON.fromJson(
                 getSavedData(ctx, ctx.getString(R.string.saved_exercise_list)),
                 EXERCISE_LIST_TYPE
         );
