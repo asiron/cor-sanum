@@ -14,11 +14,13 @@ public enum ActionType {
 
     private final String des;
 
-    private ActionType(String d) {
+    ActionType(String d) {
         des = d;
     }
 
     public String getName() {
         return des;
     }
+
+    public String toString() {return des; }
 }

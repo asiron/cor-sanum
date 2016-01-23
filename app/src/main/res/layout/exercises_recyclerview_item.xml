@@ -54,13 +54,17 @@
             <TextView
                 android:id="@+id/position"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:gravity="left|center"
+                android:textSize="20dp"/>
 
             <TextView
                 android:id="@+id/text_data"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="left|center"
                 android:transitionName="@string/exc_detail_tran_name"
+                android:textSize="20dp"
                 android:tag="Hover"/>
         </LinearLayout>
     </com.daimajia.swipe.SwipeLayout>

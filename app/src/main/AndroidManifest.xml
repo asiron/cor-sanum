@@ -19,17 +19,17 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCizR2VMFhBDMCZ-YM6LHTguhMCBTUu3vM" />
 
-        <activity android:name=".LoginActivity" >
+        <activity android:name=".activities.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MyExercises" android:screenOrientation="portrait">
+        <activity android:name=".activities.MyExercisesActivity" android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".ExerciseDetailActivity" android:screenOrientation="portrait" >
+        <activity android:name=".activities.ExerciseDetailActivity" android:screenOrientation="portrait" >
         </activity>
-        <activity android:name=".ExerciseActivity" android:screenOrientation="portrait" >
+        <activity android:name=".activities.ExerciseActivity" android:screenOrientation="portrait" >
         </activity>
 
         <service
