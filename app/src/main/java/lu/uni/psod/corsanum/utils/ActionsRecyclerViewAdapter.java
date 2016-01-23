@@ -74,7 +74,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder viewHolder, final int position) {
-        final String exerciseName = mDataset.get(position).getActionType().toString();
+        final String actionName = mDataset.get(position).getActionType().getName();
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
 
@@ -139,7 +139,7 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
         String positionText = String.valueOf(position + 1) + ".";
 
         viewHolder.textViewPos.setText(positionText);
-        viewHolder.textViewData.setText(exerciseName);
+        viewHolder.textViewData.setText(actionName);
         mItemManger.bindView(viewHolder.itemView, position);
     }
 

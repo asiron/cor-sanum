@@ -8,13 +8,14 @@ import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.models.fit.Exercise;
 import lu.uni.psod.corsanum.utils.ModelUtils;
+import lu.uni.psod.corsanum.utils.ObservableList;
 
 /**
  * Created by rlopez on 08/12/15.
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    protected ArrayList<Exercise> mExerciseList;
+    protected ObservableList<Exercise> mExerciseList;
     boolean mReloadExercises = false;
 
     public ArrayList<Exercise> getExerciseList() {
