@@ -9,8 +9,7 @@ public enum ActionType {
     WALK_SLOW("Walking slow"),
     RUN("Running"),
     RUN_FAST("Running fast"),
-    STRETCH("Stretching"),
-    UNKNOWN("Unknown action");
+    STRETCH("Stretching");
 
     private final String des;
 

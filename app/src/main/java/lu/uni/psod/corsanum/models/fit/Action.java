@@ -20,7 +20,7 @@ public class Action {
     private ActionType mActionType;
 
     public Action() {
-        this( new Position(), new Position(), 0.0, ActionType.UNKNOWN);
+        this( new Position(), new Position(), 0.0, ActionType.WALK);
     }
 
     public Action(Position mStartPos, Position mEndPos, double mExpectedDuration, ActionType mActionType) {

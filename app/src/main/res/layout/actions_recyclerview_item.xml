@@ -49,14 +49,16 @@
                 android:id="@+id/action_position"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"/>
+                android:gravity="left|center"
+                android:textSize="22dp"/>
 
             <TextView
                 android:id="@+id/action_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="left|center"
                 android:transitionName="exc_name"
-                android:textSize="15dp"
+                android:textSize="22dp"
                 android:tag="Hover"/>
         </LinearLayout>
     </com.daimajia.swipe.SwipeLayout>
