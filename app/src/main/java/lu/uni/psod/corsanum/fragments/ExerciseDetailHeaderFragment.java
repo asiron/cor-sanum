@@ -34,11 +34,11 @@ public class ExerciseDetailHeaderFragment extends Fragment {
     private final String TAG = "ExerciseDetailHeader";
 
     public interface OnActionSelectedListener {
-        public void onActionSelected(int position);
+        void onActionSelected(int position);
     }
 
-    TextView exerciseTitleTextView = null;
-    Button startExerciseButton = null;
+    private TextView exerciseTitleTextView = null;
+    private Button startExerciseButton = null;
 
     ExerciseDetailActivity activity = null;
 

@@ -2,6 +2,8 @@ package lu.uni.psod.corsanum;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.directions.route.Route;
 import com.directions.route.Routing;
@@ -22,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import lu.uni.psod.corsanum.fragments.EditActionFragment;
 import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.models.fit.Exercise;
@@ -29,8 +32,9 @@ import lu.uni.psod.corsanum.models.fit.Position;
 import lu.uni.psod.corsanum.utils.MapDecorator;
 import lu.uni.psod.corsanum.utils.ObservableList;
 
-public class    ExerciseDetailActivity extends BaseActivity
-        implements OnMapReadyCallback, ExerciseDetailHeaderFragment.OnActionSelectedListener
+public class ExerciseDetailActivity extends BaseActivity
+        implements OnMapReadyCallback, ExerciseDetailHeaderFragment.OnActionSelectedListener,
+        EditActionFragment.OnEditActionStarted
 {
 
     private final String TAG = "ExerciseDetailActivity";
@@ -53,12 +57,11 @@ public class    ExerciseDetailActivity extends BaseActivity
         mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx),0);
         mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
 
-        mHeaderFragment = (ExerciseDetailHeaderFragment) getFragmentManager()
-                        .findFragmentById(R.id.exercise_detail_header);
+        mHeaderFragment = new ExerciseDetailHeaderFragment();
+        mMapFragment    = MapFragment.newInstance();
 
-        mMapFragment = (MapFragment) getFragmentManager()
-                        .findFragmentById(R.id.exercise_detail_map);
-
+        getFragmentManager().beginTransaction().add(R.id.exercise_detail_fragment_container, mHeaderFragment, "detail_frag").commit();
+        getFragmentManager().beginTransaction().add(R.id.exercise_detail_map, mMapFragment, "map_frag").commit();
 
         mMapFragment.getMapAsync(this);
 
@@ -93,7 +96,6 @@ public class    ExerciseDetailActivity extends BaseActivity
                 md.deleteAction(index);
             }
         });
-
     }
 
     @Override
@@ -120,6 +122,12 @@ public class    ExerciseDetailActivity extends BaseActivity
     @Override
     public void onActionSelected(int position) {
         md.selectPartialRoute(position);
+    }
+
+    @Override
+    public void onEditActionStarted(int position) {
+        md.startEdit(position);
+
     }
 
 

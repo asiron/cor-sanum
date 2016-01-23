@@ -6,6 +6,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -28,17 +29,12 @@ public class MapDecorator implements RoutingSucceededListener {
 
     private String finishLineString;
 
-    //private ArrayList<Marker> mMarkers = null;
-    //private HashMap<Integer, Polyline> mPolylines = null;
-
     private Integer mCurrentSelectedRoute = -1;
 
     public MapDecorator(Context ctx, GoogleMap mMap, ObservableList<Action> model) {
         this.mCtx   = ctx;
         this.mMap   = mMap;
         this.mModel = model;
-        //this.mMarkers   = new ArrayList<>();
-        //this.mPolylines = new HashMap<>();
 
         this.finishLineString = mCtx.getResources().getString(R.string.finish_map_label);
 
@@ -72,7 +68,6 @@ public class MapDecorator implements RoutingSucceededListener {
         for (MapDecoratorItem item : mDecoratorItemsOptions) {
             item.addActionToMap(mMap);
         }
-
         zoomInCamera();
     }
 
@@ -102,12 +97,43 @@ public class MapDecorator implements RoutingSucceededListener {
         mDecoratorItemsOptions.remove(index);
     }
 
+    public void startEdit(int index) {
+        shakeMarker(index);
+        setDraggable(index, true);
+    }
+
+    private void shakeMarker(int index) {
+        mDecoratorItemsOptions.get(index).shake();
+    }
+
+    private void setDraggable(int index, boolean value) {
+        for (MapDecoratorItem item : mDecoratorItemsOptions) {
+            item.makeDraggable(value);
+        }
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+
+            }
+        });
+    }
+
+
     private void addLastAction() {
 
         int secondLast = mModel.size() - 1;
 
         Log.i(TAG, "Adding marker options " + secondLast + " with name " + mModel.get(secondLast).getActionType().getName());
-
 
         mDecoratorItemsOptions.add(new MapDecoratorItem(
                 mCtx,
@@ -149,4 +175,5 @@ public class MapDecorator implements RoutingSucceededListener {
     public Polyline addPolylineToMap(PolylineOptions polylineOptions) {
         return mMap.addPolyline(polylineOptions);
     }
+
 }
