@@ -6,13 +6,17 @@ import android.util.Log;
 import com.directions.route.Route;
 import com.directions.route.Routing;
 import com.directions.route.RoutingListener;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.R;
+import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.models.fit.Position;
 
 /**
@@ -28,8 +32,11 @@ public class MapDecoratorItem {
 
     private Integer mActionIndex = -1;
 
-    private Position startPos = null;
-    private Position endPos   = null;
+
+    private Action action = null;
+
+    private LatLng startPos = null;
+    private LatLng endPos   = null;
 
     private String firstActionName  = null;
     private String secondActionName = null;
@@ -39,77 +46,78 @@ public class MapDecoratorItem {
 
     private PolylineOptions polylineRoute = null;
 
-    MapDecoratorItem(Context ctx, RoutingSucceededListener listener,
+    private Marker firstMapMarker  = null;
+    private Marker secondMapMarker = null;
+
+    private Polyline mapPolyline = null;
+
+    MapDecoratorItem(Context ctx, Action action,
+                     RoutingSucceededListener listener,
                      Integer actionIndex,
-                     Position startPos, Position endPos,
                      String firstActionName, String secondActionName,
                      boolean hasSecondMarker) {
 
         this.context = ctx;
+        this.action = action;
+        this.mActionIndex = actionIndex;
 
         this.mListener = listener;
-
-        this.mActionIndex = actionIndex;
 
         this.firstActionName  = firstActionName;
         this.secondActionName = secondActionName;
 
-        this.startPos  = startPos;
-        this.endPos    = endPos;
+        this.startPos = new LatLng(action.getStartPos().getLat(), action.getStartPos().getLong());
+        this.endPos = new LatLng(action.getEndPos().getLat(),   action.getEndPos().getLong());
 
-        LatLng sPos = new LatLng(this.startPos.getLat(), this.startPos.getLong());
-        LatLng ePos = new LatLng(this.endPos.getLat(),   this.endPos.getLong());
-
-        firstMarker = new MarkerOptions().position(sPos).title(this.firstActionName);
+        firstMarker = new MarkerOptions().position(startPos).title(this.firstActionName);
 
         if (hasSecondMarker)
-            secondMarker = new MarkerOptions().position(ePos).title(this.secondActionName);
+            secondMarker = new MarkerOptions().position(endPos).title(this.secondActionName);
 
-        RoutingListener routingListener = new RoutingListener() {
+        buildRouter(startPos, endPos).execute();
+    }
 
-            @Override
-            public void onRoutingFailure() {
-                Log.i(TAG, "Routing failed.");
-            }
 
-            @Override
-            public void onRoutingStart() {
-                Log.i(TAG, "Routing was started.");
-            }
+    public void addActionToMap(GoogleMap map) {
+        firstMapMarker = map.addMarker(firstMarker);
+        if (secondMarker != null)
+            secondMapMarker = map.addMarker(secondMarker);
+    }
 
-            @Override
-            public void onRoutingSuccess(ArrayList<Route> routes, int i) {
+    public void deleteActionFromMap() {
+        firstMapMarker.remove();
+        if (secondMapMarker != null) {
+            secondMapMarker.remove();
+        }
+        if (mapPolyline != null) {
+            mapPolyline.remove();
+        }
+    }
 
-                int routesCount = routes.size();
-                if (routesCount <= 0) {
-                    Log.i(TAG, "No routes found, probably to close objects to each other");
-                    return;
-                } else if (routesCount > 1) {
-                    Log.i(TAG, "Found more than route choosing the first one");
-                }
+    public void reroute() {
+        mapPolyline.remove();
+        recalcPositions();
+        buildRouter(startPos, endPos).execute();
 
-                polylineRoute = new PolylineOptions();
-                polylineRoute.color(context.getResources().getColor(R.color.route_default));
-                polylineRoute.width(10);
-                polylineRoute.addAll(routes.get(0).getPoints());
+    }
 
-                mListener.addPolylineToMap(mActionIndex, polylineRoute);
-            }
+    public void setRouteColor(int color) {
+        if (mapPolyline != null) {
+            mapPolyline.setColor(color);
+        }
+    }
 
-            @Override
-            public void onRoutingCancelled() {
-                Log.i(TAG, "Routing was cancelled.");
+    public void spawnSecondMarker(GoogleMap map) {
+        secondMarker = new MarkerOptions().position(endPos).title(this.secondActionName);
+        secondMapMarker = map.addMarker(secondMarker);
+    }
 
-            }
-        };
+    public LatLng getStartPos() {
+        return startPos;
+    }
 
-        Routing routing = new Routing.Builder()
-                .travelMode(Routing.TravelMode.WALKING)
-                .withListener(routingListener)
-                .waypoints(sPos, ePos)
-                .build();
-        routing.execute();
-
+    public LatLng getEndPos() {
+        return endPos;
     }
 
     public MarkerOptions getFirstMarker() {
@@ -122,5 +130,58 @@ public class MapDecoratorItem {
 
     public PolylineOptions getPolylineRoute() {
         return polylineRoute;
+    }
+
+    private RoutingListener mRoutingListener = new RoutingListener() {
+
+        @Override
+        public void onRoutingFailure() {
+            Log.i(TAG, "Routing failed.");
+        }
+
+        @Override
+        public void onRoutingStart() {
+            Log.i(TAG, "Routing was started.");
+        }
+
+        @Override
+        public void onRoutingSuccess(ArrayList<Route> routes, int i) {
+
+            int routesCount = routes.size();
+            if (routesCount <= 0) {
+                Log.i(TAG, "No routes found, probably to close objects to each other");
+                return;
+            } else if (routesCount > 1) {
+                Log.i(TAG, "Found more than route choosing the first one");
+            }
+
+            Log.i(TAG, "Route found");
+
+            polylineRoute = new PolylineOptions();
+            polylineRoute.color(context.getResources().getColor(R.color.route_default));
+            polylineRoute.width(10);
+            polylineRoute.addAll(routes.get(0).getPoints());
+
+            mapPolyline =  mListener.addPolylineToMap(polylineRoute);
+        }
+
+        @Override
+        public void onRoutingCancelled() {
+            Log.i(TAG, "Routing was cancelled.");
+
+        }
+    };
+
+    private Routing buildRouter(LatLng sPos, LatLng ePos) {
+        return new Routing.Builder()
+                .travelMode(Routing.TravelMode.WALKING)
+                .withListener(mRoutingListener)
+                .waypoints(sPos, ePos)
+                .build();
+    }
+
+    private void recalcPositions() {
+        this.startPos = new LatLng(action.getStartPos().getLat(), action.getStartPos().getLong());
+        this.endPos = new LatLng(action.getEndPos().getLat(),   action.getEndPos().getLong());
     }
 }

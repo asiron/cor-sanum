@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.models.fit.Exercise;
 import lu.uni.psod.corsanum.models.fit.Position;
 import lu.uni.psod.corsanum.utils.MapDecorator;
+import lu.uni.psod.corsanum.utils.ObservableList;
 
 public class    ExerciseDetailActivity extends BaseActivity
         implements OnMapReadyCallback, ExerciseDetailHeaderFragment.OnActionSelectedListener
@@ -59,6 +61,39 @@ public class    ExerciseDetailActivity extends BaseActivity
 
 
         mMapFragment.getMapAsync(this);
+
+        mCurrentExercise.getActions().addListener(new ObservableList.Listener() {
+            @Override
+            public void onItemsAdded(ObservableList source, Collection items) {
+
+            }
+
+            @Override
+            public void onItemsRemoved(ObservableList source, Collection items) {
+
+            }
+
+            @Override
+            public void onStructuralChange(ObservableList source) {
+
+            }
+
+            @Override
+            public void onSingleItemRemoved(ObservableList source, int index) {
+                Log.i(TAG, "Item " + String.valueOf(index) + " removed!");
+
+                if (index == 0 || index >= source.size()) {
+                    Log.i(TAG, "Removed element was at the edge, no model change required!");
+                } else {
+                    Action previousAction = (Action) source.get(index-1);
+                    Action nextAction     = (Action) source.get(index);
+                    previousAction.setEndPos(nextAction.getStartPos());
+                }
+
+                md.deleteAction(index);
+            }
+        });
+
     }
 
     @Override

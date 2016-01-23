@@ -6,13 +6,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.fit.Action;
@@ -28,19 +25,23 @@ public class MapDecorator implements RoutingSucceededListener {
 
     private ObservableList<Action> mModel = null;
     private ArrayList<MapDecoratorItem> mDecoratorItemsOptions = null;
-    private ArrayList<Marker> mMarkers = null;
-    private HashMap<Integer, Polyline> mPolylines = null;
+
+    private String finishLineString;
+
+    //private ArrayList<Marker> mMarkers = null;
+    //private HashMap<Integer, Polyline> mPolylines = null;
 
     private Integer mCurrentSelectedRoute = -1;
-
-
 
     public MapDecorator(Context ctx, GoogleMap mMap, ObservableList<Action> model) {
         this.mCtx   = ctx;
         this.mMap   = mMap;
         this.mModel = model;
-        this.mMarkers   = new ArrayList<>();
-        this.mPolylines = new HashMap<>();
+        //this.mMarkers   = new ArrayList<>();
+        //this.mPolylines = new HashMap<>();
+
+        this.finishLineString = mCtx.getResources().getString(R.string.finish_map_label);
+
         this.mDecoratorItemsOptions = new ArrayList<>();
     }
 
@@ -58,25 +59,18 @@ public class MapDecorator implements RoutingSucceededListener {
 
                 mDecoratorItemsOptions.add(new MapDecoratorItem(
                         mCtx,
+                        mModel.get(i),
                         this,
                         i,
-                        mModel.get(i).getStartPos(),
-                        mModel.get(i).getEndPos(),
                         mModel.get(i).getActionType().getName(),
-                        null,
+                        finishLineString,
                         false));
             }
             addLastAction();
         }
 
         for (MapDecoratorItem item : mDecoratorItemsOptions) {
-            Log.i(TAG, "Adding decorator item");
-            MarkerOptions firstMarkerOpt  = item.getFirstMarker();
-            MarkerOptions secondMarkerOpt = item.getSecondMarker();
-
-            mMarkers.add(mMap.addMarker(firstMarkerOpt));
-            if (secondMarkerOpt != null)
-                mMarkers.add(mMap.addMarker(secondMarkerOpt));
+            item.addActionToMap(mMap);
         }
 
         zoomInCamera();
@@ -84,11 +78,28 @@ public class MapDecorator implements RoutingSucceededListener {
 
     public void selectPartialRoute(int index) {
         if (mCurrentSelectedRoute != -1) {
-            mPolylines.get(mCurrentSelectedRoute).setColor(mCtx.getResources().getColor(R.color.route_default));
+            mDecoratorItemsOptions.get(mCurrentSelectedRoute).setRouteColor(mCtx.getResources().getColor(R.color.route_default));
         }
 
         mCurrentSelectedRoute = index;
-        mPolylines.get(index).setColor(mCtx.getResources().getColor(R.color.route_highlighted));
+        mDecoratorItemsOptions.get(index).setRouteColor(mCtx.getResources().getColor(R.color.route_highlighted));
+    }
+
+    public void deleteAction(int index) {
+
+        if (index == 0) {
+            mDecoratorItemsOptions.get(0).deleteActionFromMap();
+        } else if (index == mDecoratorItemsOptions.size() - 1) {
+            // delete the last one + spawn second marker on the previous
+            int lastIndex = mDecoratorItemsOptions.size()-1;
+            mDecoratorItemsOptions.get(lastIndex).deleteActionFromMap();
+            mDecoratorItemsOptions.get(lastIndex-1).spawnSecondMarker(mMap);
+        } else {
+            mDecoratorItemsOptions.get(index-1).reroute();
+        }
+
+        mDecoratorItemsOptions.get(index).deleteActionFromMap();
+        mDecoratorItemsOptions.remove(index);
     }
 
     private void addLastAction() {
@@ -97,14 +108,12 @@ public class MapDecorator implements RoutingSucceededListener {
 
         Log.i(TAG, "Adding marker options " + secondLast + " with name " + mModel.get(secondLast).getActionType().getName());
 
-        String finishLineString = mCtx.getResources().getString(R.string.finish_map_label);
 
         mDecoratorItemsOptions.add(new MapDecoratorItem(
                 mCtx,
+                mModel.get(secondLast),
                 this,
                 secondLast,
-                mModel.get(secondLast).getStartPos(),
-                mModel.get(secondLast).getEndPos(),
                 mModel.get(secondLast).getActionType().getName(),
                 finishLineString,
                 true));
@@ -112,10 +121,15 @@ public class MapDecorator implements RoutingSucceededListener {
 
     private  LatLngBounds getBoundingBox() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (Marker marker : mMarkers) {
-            builder.include(marker.getPosition());
+        for (MapDecoratorItem item : mDecoratorItemsOptions) {
+            builder.include(item.getFirstMarker().getPosition());
         }
-        return builder.build();
+        return builder.include(
+                mDecoratorItemsOptions.
+                        get(mDecoratorItemsOptions.size() - 1).
+                        getSecondMarker().
+                        getPosition())
+                .build();
     }
 
     private void zoomInCamera() {
@@ -132,7 +146,7 @@ public class MapDecorator implements RoutingSucceededListener {
     }
 
     @Override
-    public void addPolylineToMap(int index, PolylineOptions polylineOptions) {
-        mPolylines.put(index, mMap.addPolyline(polylineOptions));
+    public Polyline addPolylineToMap(PolylineOptions polylineOptions) {
+        return mMap.addPolyline(polylineOptions);
     }
 }
