@@ -24,6 +24,10 @@ public class MapDecoratorItem {
 
     private Context context;
 
+    private RoutingSucceededListener mListener;
+
+    private Integer mActionIndex = -1;
+
     private Position startPos = null;
     private Position endPos   = null;
 
@@ -35,19 +39,23 @@ public class MapDecoratorItem {
 
     private PolylineOptions polylineRoute = null;
 
-    private boolean hasSecondMarker = false;
-
-    MapDecoratorItem(Context ctx, Position startPos, Position endPos, String firstActionName, String secondActionName, boolean hasSecondMarker) {
+    MapDecoratorItem(Context ctx, RoutingSucceededListener listener,
+                     Integer actionIndex,
+                     Position startPos, Position endPos,
+                     String firstActionName, String secondActionName,
+                     boolean hasSecondMarker) {
 
         this.context = ctx;
+
+        this.mListener = listener;
+
+        this.mActionIndex = actionIndex;
 
         this.firstActionName  = firstActionName;
         this.secondActionName = secondActionName;
 
         this.startPos  = startPos;
         this.endPos    = endPos;
-
-        this.hasSecondMarker = hasSecondMarker;
 
         LatLng sPos = new LatLng(this.startPos.getLat(), this.startPos.getLong());
         LatLng ePos = new LatLng(this.endPos.getLat(),   this.endPos.getLong());
@@ -72,13 +80,20 @@ public class MapDecoratorItem {
             @Override
             public void onRoutingSuccess(ArrayList<Route> routes, int i) {
 
-                for (int j=0; j<routes.size(); ++j) {
-                    polylineRoute = new PolylineOptions();
-                    polylineRoute.color(context.getResources().getColor(R.color.route_default));
-                    polylineRoute.width(10);
-                    polylineRoute.addAll(routes.get(j).getPoints());
-
+                int routesCount = routes.size();
+                if (routesCount <= 0) {
+                    Log.i(TAG, "No routes found, probably to close objects to each other");
+                    return;
+                } else if (routesCount > 1) {
+                    Log.i(TAG, "Found more than route choosing the first one");
                 }
+
+                polylineRoute = new PolylineOptions();
+                polylineRoute.color(context.getResources().getColor(R.color.route_default));
+                polylineRoute.width(10);
+                polylineRoute.addAll(routes.get(0).getPoints());
+
+                mListener.addPolylineToMap(mActionIndex, polylineRoute);
             }
 
             @Override
@@ -97,4 +112,15 @@ public class MapDecoratorItem {
 
     }
 
+    public MarkerOptions getFirstMarker() {
+        return firstMarker;
+    }
+
+    public MarkerOptions getSecondMarker() {
+        return secondMarker;
+    }
+
+    public PolylineOptions getPolylineRoute() {
+        return polylineRoute;
+    }
 }

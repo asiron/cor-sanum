@@ -23,7 +23,8 @@ public class Action {
         this( new Position(), new Position(), 0.0, ActionType.UNKNOWN);
     }
 
-    public Action(Position mEndPos, Position mStartPos, double mExpectedDuration, ActionType mActionType) {
+    public Action(Position mStartPos, Position mEndPos, double mExpectedDuration, ActionType mActionType) {
+
         this.mEndPos = mEndPos;
         this.mStartPos = mStartPos;
         this.mExpectedDuration = mExpectedDuration;

@@ -10,6 +10,8 @@
     <string name="resume_exercise_label">Resume Exercise</string>
     <string name="pause_exercise_label">Pause Exercise</string>
     <string name="stop_exercise_label">Stop Exercise</string>
+    <string name="finish_map_label">Finish</string>
+
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
