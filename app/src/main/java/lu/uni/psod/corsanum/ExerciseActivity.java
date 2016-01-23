@@ -174,7 +174,6 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
                 mMap.setOnCameraChangeListener(null);
             }
         });
-
     }
 
     public LatLngBounds getBoundingBox() {
