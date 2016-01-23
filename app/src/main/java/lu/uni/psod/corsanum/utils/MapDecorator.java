@@ -26,7 +26,7 @@ public class MapDecorator implements RoutingSucceededListener {
     private GoogleMap mMap = null;
     private Context mCtx = null;
 
-    private ArrayList<Action> mModel = null;
+    private ObservableList<Action> mModel = null;
     private ArrayList<MapDecoratorItem> mDecoratorItemsOptions = null;
     private ArrayList<Marker> mMarkers = null;
     private HashMap<Integer, Polyline> mPolylines = null;
@@ -35,7 +35,7 @@ public class MapDecorator implements RoutingSucceededListener {
 
 
 
-    public MapDecorator(Context ctx, GoogleMap mMap, ArrayList<Action> model) {
+    public MapDecorator(Context ctx, GoogleMap mMap, ObservableList<Action> model) {
         this.mCtx   = ctx;
         this.mMap   = mMap;
         this.mModel = model;

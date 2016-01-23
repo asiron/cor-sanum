@@ -18,7 +18,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected ObservableList<Exercise> mExerciseList;
     boolean mReloadExercises = false;
 
-    public ArrayList<Exercise> getExerciseList() {
+    public ObservableList<Exercise> getExerciseList() {
         return mExerciseList;
     }
 

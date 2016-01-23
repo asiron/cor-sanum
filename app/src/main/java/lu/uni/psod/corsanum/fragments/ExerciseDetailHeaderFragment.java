@@ -24,6 +24,7 @@ import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.utils.ActionsRecyclerViewAdapter;
 import lu.uni.psod.corsanum.utils.DividerItemDecoration;
+import lu.uni.psod.corsanum.utils.ObservableList;
 
 /**
  * Created by rlopez on 08/12/15.
@@ -115,7 +116,7 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         });
     }
 
-    public void updateAdapterDataset(ArrayList<Action> objects) {
+    public void updateAdapterDataset(ObservableList<Action> objects) {
         actionsRecyclerViewAdapter.updateDataset(objects);
     }
 
