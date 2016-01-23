@@ -18,5 +18,7 @@
     <string name="step_count">Step count:</string>
     <string name="save_action">Save!</string>
     <string name="add_action">Add</string>
+    <string name="minutes_label">min</string>
+    <string name="seconds_label">s</string>
 
 </resources>
