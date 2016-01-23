@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,7 +22,7 @@ import android.widget.ToggleButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import lu.uni.psod.corsanum.ExerciseActivity;
+import lu.uni.psod.corsanum.activities.ExerciseActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.services.GoogleFitService;
 

@@ -15,15 +15,13 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.util.Attributes;
 
-import java.util.ArrayList;
-
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
-import lu.uni.psod.corsanum.ExerciseActivity;
-import lu.uni.psod.corsanum.ExerciseDetailActivity;
+import lu.uni.psod.corsanum.activities.ExerciseActivity;
+import lu.uni.psod.corsanum.activities.ExerciseDetailActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.models.fit.Action;
-import lu.uni.psod.corsanum.utils.ActionsRecyclerViewAdapter;
-import lu.uni.psod.corsanum.utils.DividerItemDecoration;
+import lu.uni.psod.corsanum.utils.recyclerviews.ActionsRecyclerViewAdapter;
+import lu.uni.psod.corsanum.utils.recyclerviews.DividerItemDecoration;
 import lu.uni.psod.corsanum.utils.ObservableList;
 
 /**

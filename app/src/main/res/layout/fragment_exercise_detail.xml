@@ -19,5 +19,6 @@
         android:id="@+id/recycler_view_actions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:padding="4dp"/>
 </LinearLayout>

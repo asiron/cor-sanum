@@ -12,7 +12,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="60dp"
             android:background="#90C3D4"
             android:gravity="center"
             android:tag="Bottom3"
@@ -48,13 +48,15 @@
             <TextView
                 android:id="@+id/action_position"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textSize="15dp"/>
 
             <TextView
                 android:id="@+id/action_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:transitionName="exc_name"
+                android:textSize="15dp"
                 android:tag="Hover"/>
         </LinearLayout>
     </com.daimajia.swipe.SwipeLayout>

@@ -1,10 +1,5 @@
 package lu.uni.psod.corsanum.services;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import lu.uni.psod.corsanum.models.EnumDescription;
-
 /**
  * Created by rlopez on 15/12/15.
  */
