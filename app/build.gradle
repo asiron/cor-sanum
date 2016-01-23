@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 21
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "lu.uni.psod.corsanum"
         minSdkVersion 21
@@ -17,24 +16,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:palette-v7:21.0.0'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21+'
-
     compile 'com.google.android.gms:play-services:8.3.+'
-
-    compile "com.daimajia.swipelayout:library:1.2.0@aar"
+    compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.daimajia.androidanimations:library:1.1.2@aar'
     compile 'jp.wasabeef:recyclerview-animators:1.0.3@aar'
     compile 'com.nineoldandroids:library:2.4.0'
-
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.android.gms:play-services-maps:8.3.0'
-
     compile 'com.github.jd-alexander:library:1.0.7'
-
 }

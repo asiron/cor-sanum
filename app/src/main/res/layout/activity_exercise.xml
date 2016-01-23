@@ -7,6 +7,14 @@
     android:padding="10dp">
 
     <fragment
+        android:id="@+id/control_exercise_map"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        class="com.google.android.gms.maps.MapFragment"/>
+
+    <fragment
         android:id="@+id/control_exercise"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
@@ -15,13 +23,7 @@
         class="lu.uni.psod.corsanum.fragments.ControlExerciseFragment" />
 
     <!-- map fragment here -->
-    <fragment
-        android:id="@+id/control_exercise_map"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top"
-        android:layout_weight="1"
-        class="com.google.android.gms.maps.MapFragment"/>
+
 </LinearLayout>
 
 

@@ -20,5 +20,10 @@
     <string name="add_action">Add</string>
     <string name="minutes_label">min</string>
     <string name="seconds_label">s</string>
+    <string name="new_exercise_name_hint">Enter exercise name...</string>
+    <string name="create_new_exercise_label">Create</string>
+    <string name="cancel_create_new_exercise_label">Cancel</string>
+    <string name="app_name_string">Cor Sanum</string>
+    <string name="create_new_exercise_intent">createNewExerciseIntent</string>
 
 </resources>

@@ -45,7 +45,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
 
     private OnActionSelectedListener mActionSelectedCallback;
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -57,7 +56,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
                     + " must implement OnHeadlineSelectedListener");
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -108,8 +106,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
 
                 activity.startActivity(intent);
 
-                //Toast.makeText(activity, "Implement Exercise Activity! ", Toast.LENGTH_SHORT).show();
-
             }
         });
     }
@@ -118,8 +114,8 @@ public class ExerciseDetailHeaderFragment extends Fragment {
         actionsRecyclerViewAdapter.updateDataset(objects);
     }
 
-
     public OnActionSelectedListener getActionSelectedCallback() {
         return mActionSelectedCallback;
     }
 }
+
