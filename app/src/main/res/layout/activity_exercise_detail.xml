@@ -6,22 +6,25 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <fragment
-        android:id="@+id/exercise_detail_header"
-        android:layout_width="fill_parent"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="top"
         android:layout_weight="1"
-        class="lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment" />
+        android:orientation="vertical"
+        android:layout_gravity="top"
+        android:id="@+id/exercise_detail_fragment_container">
+    </LinearLayout>
 
-    <!-- map fragment here -->
-    <fragment
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/exercise_detail_map"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
         android:layout_height="0dp"
-        android:layout_gravity="top"
         android:layout_weight="1"
-        class="com.google.android.gms.maps.MapFragment"/>
+        android:layout_gravity="top">
+    </LinearLayout>
+
 </LinearLayout>
+
 
 

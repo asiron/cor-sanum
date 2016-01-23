@@ -128,6 +128,12 @@ public class MapDecoratorItem {
         return secondMarker;
     }
 
+    public void shake() {
+        MarkerAnimation.shake(firstMapMarker);
+        if(secondMapMarker != null)
+            MarkerAnimation.shake(secondMapMarker);
+    }
+
     public PolylineOptions getPolylineRoute() {
         return polylineRoute;
     }
@@ -183,5 +189,11 @@ public class MapDecoratorItem {
     private void recalcPositions() {
         this.startPos = new LatLng(action.getStartPos().getLat(), action.getStartPos().getLong());
         this.endPos = new LatLng(action.getEndPos().getLat(),   action.getEndPos().getLong());
+    }
+
+    public void makeDraggable(boolean value) {
+        firstMapMarker.setDraggable(value);
+        if (secondMapMarker != null)
+            secondMapMarker.setDraggable(value);
     }
 }

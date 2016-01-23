@@ -18,6 +18,7 @@ import com.daimajia.swipe.implments.SwipeItemRecyclerMangerImpl;
 import java.util.ArrayList;
 
 import lu.uni.psod.corsanum.R;
+import lu.uni.psod.corsanum.fragments.EditActionFragment;
 import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 import lu.uni.psod.corsanum.models.fit.Action;
 
@@ -124,6 +125,13 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
         viewHolder.buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                EditActionFragment frag = EditActionFragment.newInstance(position);
+
+                mContext.getFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right)
+                        .replace(R.id.exercise_detail_fragment_container, frag).commit();
 
                 Toast.makeText(view.getContext(), "Trying to edit " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
 
