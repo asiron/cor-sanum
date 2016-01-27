@@ -26,7 +26,9 @@ public class ModelUtils {
         Log.i(TAG, "Trying to retrieve value for key: " + key);
         SharedPreferences sp = ctx.getSharedPreferences(
                 ctx.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        return sp.getString(key, "");
+        String value =  sp.getString(key, "");
+        Log.i(TAG, "Retrieving value: " + value);
+        return value;
     }
 
     public static void saveData(Context ctx, String key, String value) {

@@ -114,12 +114,18 @@ public class MapDecoratorItem {
         firstMapMarker.setTitle(title);
     }
 
-    public void setMarkerColor(float color) {
-        if (secondMapMarker != null) {
-            secondMapMarker.setIcon(BitmapDescriptorFactory.
-                    defaultMarker(color));
-        }
+    public void setFirstMarkerColor(float color) {
         firstMapMarker.setIcon(BitmapDescriptorFactory.defaultMarker(color));
+    }
+
+    public void setSecondMarkerColor(float color) {
+        secondMapMarker.setIcon(BitmapDescriptorFactory.defaultMarker(color));
+    }
+
+    public void setMarkerColor(float color) {
+        if (secondMapMarker != null)
+            setSecondMarkerColor(color);
+        setFirstMarkerColor(color);
     }
 
     public void spawnSecondMarker(GoogleMap map) {
@@ -213,9 +219,11 @@ public class MapDecoratorItem {
     public void updateModelPositionFromMarker(Marker m, PositionType pos) {
 
         if (pos == PositionType.START) {
+            Log.i(TAG, "Update model executed on start pos marker!");
             this.startPos = m.getPosition();
             action.setStartPos(new Position(startPos.latitude, startPos.longitude));
         } else if (pos == PositionType.END) {
+            Log.i(TAG, "Update model executed on end pos marker!");
             this.endPos = m.getPosition();
             action.setEndPos(new Position(endPos.latitude, endPos.longitude));
         }

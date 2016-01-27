@@ -27,8 +27,9 @@ public class LocationSourceMock implements LocationSource {
         public EmptyActionRoute(String err) { super(err); }
     }
 
-    public interface OnPartialRouteCompletedListener {
-        void onPartialRouteCompleted();
+    public interface OnExerciseStageChangedListener {
+        void onPartialRouteStarted(int actionIndex);
+        void onPartialRouteCompleted(int actionIndex);
         void onFullRouteCompleted();
     }
 
@@ -41,13 +42,12 @@ public class LocationSourceMock implements LocationSource {
     private Handler mHandler = null;
     private MapController mMapController = null;
     private OnLocationChangedListener mOnLocationChangedListener = null;
-    private OnPartialRouteCompletedListener  mOnPartialRouteCompletedListener = null;
+    private OnExerciseStageChangedListener mOnExerciseStageChangedListener = null;
 
     private int mCurrentActionIndex = 0;
     private int mCurrentRoutePointIndex = 0;
     private double mCurrentInterpolationDistance = 0;
     private double mCurrentInterpolationDistanceTraveled = 0;
-
 
     private List<LatLng> mCurrentRoute = null;
     private LatLng mCurrentLocation = null;
@@ -69,22 +69,18 @@ public class LocationSourceMock implements LocationSource {
         }
     };
 
-    public LocationSourceMock(MapController mapController, double speed, OnPartialRouteCompletedListener listener) {
+    public LocationSourceMock(MapController mapController, double speed, OnExerciseStageChangedListener listener) {
         this.mMapController = mapController;
         this.mSpeed = (speed * 1000.0) / 3600.0;
-        this.mOnPartialRouteCompletedListener = listener;
+        this.mOnExerciseStageChangedListener = listener;
         this.mHandler = new Handler();
     }
 
-    public LocationSourceMock(MapController mapController, OnPartialRouteCompletedListener listener) {
+    public LocationSourceMock(MapController mapController, OnExerciseStageChangedListener listener) {
         this(mapController, 400.0, listener);
     }
 
     private Location getNextLocation() {
-
-        if (MapUtils.distBetween(mCurrentLocation, mNextPointLocation) <= 0.5) {
-            acceptNextInterval();
-        }
 
         if (mCurrentLocation == null) {
             Log.e(TAG, "Current actual location was null");
@@ -95,6 +91,9 @@ public class LocationSourceMock implements LocationSource {
             return null;
         }
 
+        if (MapUtils.distBetween(mCurrentLocation, mNextPointLocation) <= 0.5) {
+            acceptNextInterval();
+        }
 
         mCurrentInterpolationDistanceTraveled += (mSpeed * (UPDATE_PERIOD / 1000.0f));
 
@@ -118,13 +117,23 @@ public class LocationSourceMock implements LocationSource {
         location.setSpeed((float) mSpeed);
         location.setLatitude(nextPoint.latitude);
         location.setLongitude(nextPoint.longitude);
-        //location.setBearing(randomizer.nextInt(360));
 
         return location;
     }
 
     private void scheduleNewFix() {
         mHandler.postDelayed(updateLocationRunnable, UPDATE_PERIOD);
+    }
+
+    private void reinit() {
+        mCurrentActionIndex = 0;
+        mCurrentRoutePointIndex = 0;
+        mCurrentRoute = mMapController
+                .getItem(0).getPolylineRoute().getPoints();
+        mCurrentPointLocation = mCurrentRoute.get(mCurrentRoutePointIndex);
+        mCurrentLocation = mCurrentPointLocation;
+        mNextPointLocation = mCurrentRoute.get(mCurrentRoutePointIndex+1);
+
     }
 
     private void initLocation() {
@@ -136,6 +145,10 @@ public class LocationSourceMock implements LocationSource {
             mTotalRouteLength +=  MapUtils.routeLength(
                     mMapController.getItem(i).getPolylineRoute().getPoints()
             );
+        }
+
+        if (mMapController.getActionCount() > 0) {
+            mOnExerciseStageChangedListener.onPartialRouteStarted(0);
         }
 
         Log.i(TAG, "Total route distance " + String.valueOf(mTotalRouteLength));
@@ -182,19 +195,21 @@ public class LocationSourceMock implements LocationSource {
         if (mCurrentRoutePointIndex >= mCurrentRoute.size()) {
             // Partial route finished, check if full route finished
             Log.i(TAG, "Partial route " + String.valueOf(mCurrentActionIndex) + " finished!");
-            mOnPartialRouteCompletedListener.onPartialRouteCompleted();
+            mOnExerciseStageChangedListener.onPartialRouteCompleted(mCurrentActionIndex);
             mCurrentActionIndex++;
 
             if (mCurrentActionIndex >= mMapController.getActionCount() ) {
                 // Full route finished, handle it
                 Log.i(TAG, "Full route finished!");
-                mOnPartialRouteCompletedListener.onFullRouteCompleted();
-                deactivate();
+                mOnExerciseStageChangedListener.onFullRouteCompleted();
+                reinit();
+                pause();
                 throw new RouteFinishedException("Route finished");
             } else {
                 mCurrentRoute = mMapController
                         .getItem(mCurrentActionIndex).getPolylineRoute().getPoints();
                 mCurrentRoutePointIndex = 0;
+                mOnExerciseStageChangedListener.onPartialRouteStarted(mCurrentActionIndex);
             }
         }
         Log.d(TAG, "Getting new point: " + String.valueOf(mCurrentRoutePointIndex));
@@ -226,6 +241,7 @@ public class LocationSourceMock implements LocationSource {
 
     public void resume() {
         mPaused = false;
+        mHandler.removeCallbacks(updateLocationRunnable);
         scheduleNewFix();
     }
 

@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.CountDownTimer;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,9 +33,18 @@ import lu.uni.psod.corsanum.services.GoogleFitService;
 
 public class ControlExerciseFragment extends Fragment {
 
+
     public interface OnMockEnabledListener {
         void onMockEnabled();
         void onMockDisabled();
+    }
+
+    public interface OnExerciseStateChangedListener {
+        void onExerciseStart();
+        void onExerciseResume();
+        void onExerciseStop();
+        void onExercisePause();
+
     }
 
     private static final String TAG = "ControlExerciseFragment";
@@ -42,6 +52,7 @@ public class ControlExerciseFragment extends Fragment {
     private static final String IS_EXERCISE_RUNNING = "exercise_running";
 
     private OnMockEnabledListener mMockEnabledCallbacks;
+    private OnExerciseStateChangedListener mOnExerciseStateChangedListener;
 
     private ExerciseActivity activity = null;
 
@@ -81,6 +92,8 @@ public class ControlExerciseFragment extends Fragment {
 
         if (savedInstanceState != null)
             isExerciseRunning = savedInstanceState.getBoolean(IS_EXERCISE_RUNNING, false);
+
+        //boolean mFreeRoute = getArguments().getBoolean(FREE_RUN_INTENT, false);
 
         activity = (ExerciseActivity) getActivity();
 
@@ -124,6 +137,7 @@ public class ControlExerciseFragment extends Fragment {
         stopExerciseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mOnExerciseStateChangedListener.onExerciseStop();
                 stopExercise();
             }
         });
@@ -146,20 +160,23 @@ public class ControlExerciseFragment extends Fragment {
     private void startResumeExercise() {
         if (isExerciseRunning) {
             Log.i(TAG, "Resuming exercise.");
+            mOnExerciseStateChangedListener.onExerciseResume();
+
         } else {
             Log.i(TAG, "Starting new exercise.");
+            mOnExerciseStateChangedListener.onExerciseStart();
             startPauseExerciseButton.setTextOff(activity.getResources().getString(R.string.resume_exercise_label));
             stopExerciseButton.setVisibility(View.VISIBLE);
-
+            isExerciseRunning = true;
             startGoogleFitService();
         }
     }
 
     private void pauseExercise() {
-        // TODO handle
+        mOnExerciseStateChangedListener.onExercisePause();
     }
 
-    private void stopExercise() {
+    public void stopExercise() {
         Intent service = new Intent(activity, GoogleFitService.class);
         activity.stopService(service);
         Log.i(TAG, "Service stopped.");
@@ -195,6 +212,7 @@ public class ControlExerciseFragment extends Fragment {
 
         try {
             mMockEnabledCallbacks = (OnMockEnabledListener) activity;
+            mOnExerciseStateChangedListener = (OnExerciseStateChangedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
@@ -300,6 +318,23 @@ public class ControlExerciseFragment extends Fragment {
                 }
             }
         }
+    }
+
+    public void updateActionTitleDisplay(String title) {
+        stretchTimerTextView.setText(title);
+    }
+
+    public void startTimer(long seconds, final ExerciseActivity.StrechTimerFinishedListener callback) {
+        new CountDownTimer(seconds * 1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                Log.i(TAG, "Mock Timer finished!");
+                callback.onTimerFinishedCallback();
+            }
+        }.start();
+        Log.i(TAG, "Mock Timer started for " + seconds);
     }
 
     @Override
