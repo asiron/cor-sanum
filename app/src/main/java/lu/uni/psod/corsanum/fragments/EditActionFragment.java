@@ -138,6 +138,8 @@ public class EditActionFragment extends Fragment {
                 if (selectedActionType == ActionType.STRETCH)
                     editedAction.setExpectedDuration(getDurationAsFloat());
 
+                activity.getCurrentExercise().getActions().notifyItemChanged(editedIndex);
+
                 mEditActionsCallback.onEditActionFinished();
 
                 ExerciseDetailHeaderFragment frag = new ExerciseDetailHeaderFragment();
@@ -202,6 +204,6 @@ public class EditActionFragment extends Fragment {
 
     private double getDurationAsFloat() {
         return stretchMinutesDurationPicker.getValue() * 60.0 +
-            stretchSecondsDurationPicker.getValue();
+            stretchSecondsDurationPicker.getValue() * 10.0;
     }
 }

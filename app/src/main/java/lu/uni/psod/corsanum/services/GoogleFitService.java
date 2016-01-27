@@ -52,6 +52,9 @@ public class GoogleFitService extends Service {
     public static final String FIT_STEPS_DATA_INTENT = "fitStepsDataIntent";
     public static final String FIT_STEPS_DATA_EXTRA_STEPS = "fitStepsDataSteps";
 
+    public static final String FIT_SPEED_DATA_INTENT = "fitSpeedDataIntent";
+    public static final String FIT_SPEED_DATA_EXTRA_SPEED = "fitSpeedDataSpeed";
+
     public static final String FIT_NOTIFY_INTENT = "fitStatusUpdateIntent";
     public static final String FIT_LOGIN_INTENT = "fitLoginIntent";
     public static final String FIT_EXTRA_CONNECTION_MESSAGE = "fitFirstConnection";
@@ -99,6 +102,20 @@ public class GoogleFitService extends Service {
             }
         }
     };
+
+    private OnDataPointListener mSpeedDataPointListener = new OnDataPointListener() {
+        @Override
+        public void onDataPoint(DataPoint dataPoint) {
+            for (Field field : dataPoint.getDataType().getFields()) {
+                if (field.getName().equals("speed")) {
+                    float currentSpeed = (dataPoint.getValue(field).asFloat() * 3600.0f) / 1000.0f;
+                    notifyUiFitSpeedData(currentSpeed);
+                    Log.i(TAG, "Received Speed from GoogleFit: " + String.valueOf(currentSpeed));
+                }
+            }
+        }
+    };
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -223,6 +240,12 @@ public class GoogleFitService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private void notifyUiFitSpeedData(float speed) {
+        Intent intent = new Intent(FIT_SPEED_DATA_INTENT);
+        intent.putExtra(FIT_SPEED_DATA_EXTRA_SPEED, speed);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     private void handleLogin(Intent intent) {
         Log.i(TAG, "Received login/logout intent");
         new Thread(new Runnable() {
@@ -245,7 +268,9 @@ public class GoogleFitService extends Service {
         Fitness.SensorsApi.findDataSources(mGoogleApiFitnessClient, new DataSourcesRequest.Builder()
                 .setDataTypes(
                         DataType.TYPE_LOCATION_SAMPLE,
-                        DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                        DataType.TYPE_STEP_COUNT_CUMULATIVE,
+                        DataType.TYPE_SPEED
+                )
                 .build())
                 .setResultCallback(new ResultCallback<DataSourcesResult>() {
                     @Override
@@ -274,6 +299,13 @@ public class GoogleFitService extends Service {
                                         mStepsDataPointListener);
                             }
 
+                            if (dataSource.getDataType().equals(DataType.TYPE_SPEED)) {
+                                Log.i(TAG, "Data source for TYPE_SPEED found!  Registering.");
+                                registerFitnessDataListener(
+                                        dataSource,
+                                        DataType.TYPE_SPEED,
+                                        mSpeedDataPointListener);
+                            }
                         }
                     }
                 });
@@ -285,7 +317,7 @@ public class GoogleFitService extends Service {
                 new SensorRequest.Builder()
                         .setDataSource(dataSource)
                         .setDataType(dataType)
-                        .setSamplingRate(1, TimeUnit.SECONDS)
+                        .setSamplingRate(500, TimeUnit.MILLISECONDS)
                         .build(),
                 listener)
                 .setResultCallback(new ResultCallback<Status>() {

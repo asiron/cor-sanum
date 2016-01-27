@@ -36,6 +36,7 @@ public class LocationSourceMock implements LocationSource {
     private static final float ACCURACY = 1; // Meters
 
     private boolean mDeactivated = true;
+    private boolean mPaused      = false;
 
     private Handler mHandler = null;
     private MapController mMapController = null;
@@ -64,7 +65,7 @@ public class LocationSourceMock implements LocationSource {
         public void run() {
             Location nextLocation = getNextLocation();
             mOnLocationChangedListener.onLocationChanged(nextLocation);
-            if (!mDeactivated) scheduleNewFix();
+            if (!mDeactivated && !mPaused) scheduleNewFix();
         }
     };
 
@@ -81,16 +82,16 @@ public class LocationSourceMock implements LocationSource {
 
     private Location getNextLocation() {
 
-        if (MapUtils.distBetween(mCurrentLocation, mNextPointLocation) <= 2) {
+        if (MapUtils.distBetween(mCurrentLocation, mNextPointLocation) <= 0.5) {
             acceptNextInterval();
         }
 
         if (mCurrentLocation == null) {
-            Log.i(TAG, "Current actual location was null");
+            Log.e(TAG, "Current actual location was null");
             return null;
         }
         else if (mNextPointLocation == null) {
-            Log.i(TAG, "Current actual location was null");
+            Log.e(TAG, "Current actual location was null");
             return null;
         }
 
@@ -146,27 +147,27 @@ public class LocationSourceMock implements LocationSource {
         try {
             mCurrentLocation = acceptNextPoint();
         } catch (LocationSourceMockException e) {
-            Log.i(TAG, "Exception caught: " + e.getMessage());
+            Log.e(TAG, "Exception caught: " + e.getMessage());
         }
         mNextPointLocation = peekNextPoint();
         mCurrentPointLocation = mCurrentLocation;
         mCurrentInterpolationDistance =
                 MapUtils.distBetween(mCurrentLocation, mNextPointLocation);
-        Log.i(TAG, "Distance for this interval is " + String.valueOf(mCurrentInterpolationDistance));
+        Log.d(TAG, "Distance for this interval is " + String.valueOf(mCurrentInterpolationDistance));
         mCurrentInterpolationDistanceTraveled = 0.0;
     }
 
     private LatLng peekNextPoint() {
         if (mCurrentRoutePointIndex < mCurrentRoute.size() &&
                 mCurrentActionIndex < mMapController.getActionCount()) {
-            Log.i(TAG, "Peeking at point of idx: "
+            Log.d(TAG, "Peeking at point of idx: "
                     + String.valueOf(mCurrentRoutePointIndex)
                     + " and action index: "
                     + String.valueOf(mCurrentActionIndex));
             return mCurrentRoute.get(mCurrentRoutePointIndex);
         } else if (mCurrentRoutePointIndex >= mCurrentRoute.size() &&
                 mCurrentActionIndex < mMapController.getActionCount()-1) {
-            Log.i(TAG, "Peeking exceeded action, getting second action "
+            Log.d(TAG, "Peeking exceeded action, getting second action "
                     + String.valueOf(mCurrentActionIndex+1));
             return mMapController.
                     getItem(mCurrentActionIndex+1).
@@ -196,11 +197,11 @@ public class LocationSourceMock implements LocationSource {
                 mCurrentRoutePointIndex = 0;
             }
         }
-        Log.i(TAG, "Getting new point: " + String.valueOf(mCurrentRoutePointIndex));
+        Log.d(TAG, "Getting new point: " + String.valueOf(mCurrentRoutePointIndex));
 
         if (mCurrentRoutePointIndex >= mCurrentRoute.size()) {
             // couldnt retrieve new point, something is wrong
-            Log.i(TAG, "New action has an empty route");
+            Log.d(TAG, "New action has an empty route");
             throw new EmptyActionRoute("Action doesn't have route");
         } else {
             LatLng nextPoint = mCurrentRoute.get(mCurrentRoutePointIndex);
@@ -213,7 +214,7 @@ public class LocationSourceMock implements LocationSource {
     public void activate(OnLocationChangedListener onLocationChangedListener) {
         mDeactivated = false;
         this.mOnLocationChangedListener = onLocationChangedListener;
-        initLocation();
+        if (mPaused == false) initLocation();
         scheduleNewFix();
     }
 
@@ -222,4 +223,12 @@ public class LocationSourceMock implements LocationSource {
         mDeactivated = true;
         mHandler.removeCallbacks(updateLocationRunnable);
     }
+
+    public void resume() {
+        mPaused = false;
+        scheduleNewFix();
+    }
+
+    public void pause() { mPaused = true; }
+
 }

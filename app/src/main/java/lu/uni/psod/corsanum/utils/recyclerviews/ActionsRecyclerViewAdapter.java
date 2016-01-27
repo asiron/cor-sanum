@@ -105,12 +105,12 @@ public class ActionsRecyclerViewAdapter extends RecyclerSwipeAdapter<ActionsRecy
                 notifyDataSetChanged();
             }
         });
+
         viewHolder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
             @Override
-            public void onDoubleClick(SwipeLayout layout, boolean surface) {
-                //Toast.makeText(mContext.getActivity(), "DoubleClick", Toast.LENGTH_SHORT).show();
-            }
+            public void onDoubleClick(SwipeLayout layout, boolean surface) {}
         });
+
         viewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

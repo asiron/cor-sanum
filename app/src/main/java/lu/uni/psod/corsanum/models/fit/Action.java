@@ -62,4 +62,18 @@ public class Action {
     public void setActionType(ActionType actionType) {
         this.mActionType = actionType;
     }
+
+    public String getFullDesc() {
+
+        String fullDesc = mActionType.getName();
+
+        if (mExpectedDuration != 0.0 && mActionType == ActionType.STRETCH) {
+            int durationSeconds = ((int)mExpectedDuration) % 60;
+            int durationMinutes = ((int)mExpectedDuration) / 60;
+            fullDesc += (
+                    " " + String.valueOf(durationMinutes)
+                            + "m " + String.valueOf(durationSeconds) + "s");
+        }
+        return fullDesc;
+    }
 }
