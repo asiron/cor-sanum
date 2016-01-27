@@ -132,8 +132,11 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
         });
         mMC.initMapController();
         mMC.setMyLocationChangedCallback(this);
-        mMC.setFollowPosition(true);
+        mMC.setFollowPosition(true, 100);
         mMap.setMyLocationEnabled(true);
+
+        if (isFreeRoute)
+            mMC.setFollowPosition(true, 1);
     }
 
     public int getCurrentExerciseIndex() {
