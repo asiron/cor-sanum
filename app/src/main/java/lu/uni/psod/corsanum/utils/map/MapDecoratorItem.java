@@ -110,6 +110,10 @@ public class MapDecoratorItem {
         }
     }
 
+    public void setTitle(String title) {
+        firstMapMarker.setTitle(title);
+    }
+
     public void setMarkerColor(float color) {
         if (secondMapMarker != null) {
             secondMapMarker.setIcon(BitmapDescriptorFactory.
@@ -215,6 +219,10 @@ public class MapDecoratorItem {
             this.endPos = m.getPosition();
             action.setEndPos(new Position(endPos.latitude, endPos.longitude));
         }
+    }
+
+    public void updateTitle() {
+        setTitle(action.getFullDesc());
     }
 
     public enum PositionType {

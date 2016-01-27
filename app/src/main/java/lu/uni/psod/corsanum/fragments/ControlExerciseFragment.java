@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -22,14 +24,24 @@ import android.widget.ToggleButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import org.w3c.dom.Text;
+
 import lu.uni.psod.corsanum.activities.ExerciseActivity;
 import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.services.GoogleFitService;
 
 public class ControlExerciseFragment extends Fragment {
+
+    public interface OnMockEnabledListener {
+        void onMockEnabled();
+        void onMockDisabled();
+    }
+
     private static final String TAG = "ControlExerciseFragment";
 
     private static final String IS_EXERCISE_RUNNING = "exercise_running";
+
+    private OnMockEnabledListener mMockEnabledCallbacks;
 
     private ExerciseActivity activity = null;
 
@@ -39,12 +51,14 @@ public class ControlExerciseFragment extends Fragment {
     private static final int REQUEST_OAUTH = 1431;
 
     private TextView exerciseTitleTextView = null;
-
-    private TextView stepCountTextView = null;
-    private TextView speedTextView     = null;
+    private TextView stepCountTextView     = null;
+    private TextView speedTextView         = null;
+    private TextView stretchTimerTextView   = null;
 
     private Button stopExerciseButton = null;
     private ToggleButton startPauseExerciseButton = null;
+
+    private Switch mockEnableSwitch = null;
 
     private boolean isExerciseRunning = false;
 
@@ -70,12 +84,26 @@ public class ControlExerciseFragment extends Fragment {
 
         activity = (ExerciseActivity) getActivity();
 
+        stretchTimerTextView = (TextView) activity.findViewById(R.id.stretch_timer);
         stepCountTextView  = (TextView) activity.findViewById(R.id.step_count);
         speedTextView      = (TextView) activity.findViewById(R.id.speed);
         stopExerciseButton = (Button) activity.findViewById(R.id.stop_exercise);
         startPauseExerciseButton = (ToggleButton) activity.findViewById(R.id.start_pause_exercise);
-        exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_title);
 
+        mockEnableSwitch = (Switch) activity.findViewById(R.id.mock_enable_switch);
+        mockEnableSwitch.setChecked(false);
+        mockEnableSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    mMockEnabledCallbacks.onMockEnabled();
+                else
+                    mMockEnabledCallbacks.onMockDisabled();
+            }
+        });
+
+
+        exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_title);
         exerciseTitleTextView.setText(activity.getCurrentExercise().getExerciseName());
 
         startPauseExerciseButton.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +137,9 @@ public class ControlExerciseFragment extends Fragment {
         LocalBroadcastManager
                 .getInstance(activity)
                 .registerReceiver(mFitLocationDataReceiver, new IntentFilter(GoogleFitService.FIT_LOCATION_DATA_INTENT));
+        LocalBroadcastManager
+                .getInstance(activity)
+                .registerReceiver(mFitSpeedDataReceiver, new IntentFilter(GoogleFitService.FIT_SPEED_DATA_INTENT));
 
     }
 
@@ -161,6 +192,13 @@ public class ControlExerciseFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
+        try {
+            mMockEnabledCallbacks = (OnMockEnabledListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
     @Override
@@ -173,10 +211,23 @@ public class ControlExerciseFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.hasExtra(GoogleFitService.FIT_STEPS_DATA_EXTRA_STEPS)) {
                 final int totalSteps = intent.getIntExtra(GoogleFitService.FIT_STEPS_DATA_EXTRA_STEPS, 0);
-                stepCountTextView.setText(activity.getResources().getString(R.string.step_count) + String.valueOf(totalSteps));
+                stepCountTextView.setText(activity.getResources().getString(R.string.step_count) + " " +  String.valueOf(totalSteps));
             }
         }
     };
+
+    private BroadcastReceiver mFitSpeedDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(GoogleFitService.FIT_SPEED_DATA_EXTRA_SPEED)) {
+                final float speed = intent.getFloatExtra(GoogleFitService.FIT_SPEED_DATA_EXTRA_SPEED, 0);
+                speedTextView.setText(activity.getResources().getString(R.string.speed_front_label)
+                        + " " + String.format("%.2f", speed)
+                        + " " + activity.getResources().getString(R.string.speed_back_label));
+            }
+        }
+    };
+
 
     private BroadcastReceiver mFitLocationDataReceiver = new BroadcastReceiver() {
         @Override
@@ -184,9 +235,8 @@ public class ControlExerciseFragment extends Fragment {
             if (intent.hasExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LAT) &&
                     intent.hasExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LONG))
             {
-                float latitude  = intent.getIntExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LAT, 0);
-                float longitude = intent.getIntExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LONG, 0);
-
+                float latitude  = intent.getFloatExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LAT, 0f);
+                float longitude = intent.getFloatExtra(GoogleFitService.FIT_LOCATION_DATA_EXTRA_LONG, 0f);
 
             }
         }
@@ -261,6 +311,8 @@ public class ControlExerciseFragment extends Fragment {
     public void onDestroy() {
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStatusReceiver);
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitStepsDataReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitSpeedDataReceiver);
+
         super.onDestroy();
     }
 }

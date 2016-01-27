@@ -28,6 +28,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mExerciseList = ModelUtils.loadExercises(this);
+        Log.i(TAG, "onCreate");
     }
 
     @Override

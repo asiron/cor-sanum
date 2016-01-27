@@ -15,7 +15,7 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="step_count">Step count:</string>
+    <string name="step_count">Steps:</string>
     <string name="save_action">Save!</string>
     <string name="add_action">Add</string>
     <string name="minutes_label">min</string>
@@ -28,5 +28,7 @@
     <string name="create_shared_label">Return to factory settings</string>
     <string name="my_exercises_label">My exercises</string>
     <string name="free_route_label">Free route</string>
+    <string name="speed_front_label">Speed:</string>
+    <string name="speed_back_label">km/h</string>
 
 </resources>

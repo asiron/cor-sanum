@@ -14,7 +14,8 @@ import lu.uni.psod.corsanum.models.fit.Exercise;
 import lu.uni.psod.corsanum.utils.map.LocationSourceMock;
 import lu.uni.psod.corsanum.utils.map.MapController;
 
-public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback {
+public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback,
+        ControlExerciseFragment.OnMockEnabledListener {
 
     private final String TAG = "ExerciseActivity";
 
@@ -22,11 +23,13 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     private ControlExerciseFragment mControlExerciseFragment  = null;
 
     private GoogleMap mMap = null;
+    private LocationSourceMock mLSM = null;
 
     private HashMap<Integer, Marker> mMarkers;
 
     private int mCurrentExerciseIndex = 0;
     private Exercise mCurrentExercise = null;
+    private MapController mMC = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +55,8 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-
-        MapController mc = new MapController(this, mMap, mCurrentExercise.getActions(), true);
-        mc.initMapDecorator();
-        mc.setMock(new LocationSourceMock(mc, new LocationSourceMock.OnPartialRouteCompletedListener() {
+        mMC = new MapController(this, mMap, mCurrentExercise.getActions(), true);
+        mLSM = new LocationSourceMock(mMC, new LocationSourceMock.OnPartialRouteCompletedListener() {
             @Override
             public void onPartialRouteCompleted() {
 
@@ -65,18 +66,28 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
             public void onFullRouteCompleted() {
 
             }
-        }));
-
+        });
+        mMC.initMapController();
+        mMC.setFollowPosition(true);
         mMap.setMyLocationEnabled(true);
     }
-
 
     public int getCurrentExerciseIndex() {
         return mCurrentExerciseIndex;
     }
-
     public Exercise getCurrentExercise() {
         return mCurrentExercise;
     }
 
+    @Override
+    public void onMockEnabled() {
+        mMC.trySetMock(mLSM);
+        mLSM.resume();
+    }
+
+    @Override
+    public void onMockDisabled() {
+        mLSM.pause();
+        mMC.disableMock();
+    }
 }

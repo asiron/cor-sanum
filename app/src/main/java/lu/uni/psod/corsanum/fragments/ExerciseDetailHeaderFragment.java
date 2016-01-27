@@ -111,6 +111,7 @@ public class ExerciseDetailHeaderFragment extends Fragment {
     }
 
     public void updateAdapterDataset(ObservableList<Action> objects) {
+        Log.i(TAG, "Data set reloaded in Action recycler view.");
         actionsRecyclerViewAdapter.updateDataset(objects);
     }
 

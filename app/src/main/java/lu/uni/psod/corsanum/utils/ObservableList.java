@@ -239,7 +239,15 @@ public class ObservableList<T> implements List<T> {
         }
     }
 
+    public void notifyItemChanged(int index) {
+        for (Listener<T> l : listeners) {
+            l.onItemChanged(this, index);
+        }
+    }
+
     public static interface Listener<T> {
+
+        void onItemChanged(ObservableList<T> source, int index);
 
         void onSingleItemRemoved(ObservableList<T> source, int index);
 

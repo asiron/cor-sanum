@@ -28,6 +28,8 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
     private int mCurrentExerciseIndex = 0;
     private Exercise mCurrentExercise = null;
 
+    private boolean createNewExercise = false;
+
     private MapFragment mMapFragment = null;
     private ExerciseDetailHeaderFragment mDetailFragment = null;
     private EditActionFragment mEditFragment = null;
@@ -54,10 +56,14 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
             mExerciseList.add(mCurrentExercise);
             mCurrentExerciseIndex = mExerciseList.size() - 1;
             topFrag = mEditFragment  = EditActionFragment.newInstance(-1);
+            createNewExercise = true;
+
         } else {
             mCurrentExerciseIndex = intent.getIntExtra(getString(R.string.current_exercise_idx), 0);
             mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
             topFrag = mDetailFragment = new ExerciseDetailHeaderFragment();
+
+            createNewExercise = false;
         }
 
         getFragmentManager().beginTransaction().add(R.id.exercise_detail_fragment_container, topFrag, "detail_frag").commit();
@@ -65,21 +71,40 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
 
         mMapFragment.getMapAsync(this);
 
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        mMap = map;
+        mMap.setMyLocationEnabled(true);
+
+        md = new MapController(this, mMap, mCurrentExercise.getActions(), false);
+        md.initMapController();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mDetailFragment != null)
+            mDetailFragment.updateAdapterDataset(mExerciseList.get(mCurrentExerciseIndex).getActions());
+
+        mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
         mCurrentExercise.getActions().addListener(new ObservableList.Listener() {
 
             @Override
-            public void onItemsAdded(ObservableList source, Collection items) {
-
-            }
+            public void onItemsAdded(ObservableList source, Collection items) {}
 
             @Override
-            public void onItemsRemoved(ObservableList source, Collection items) {
-
-            }
+            public void onItemsRemoved(ObservableList source, Collection items) {}
 
             @Override
-            public void onStructuralChange(ObservableList source) {
+            public void onStructuralChange(ObservableList source) {}
 
+            @Override
+            public void onItemChanged(ObservableList source, int index) {
+                Log.i(TAG, "Item " + String.valueOf(index) + " changed!");
+                md.updateAction(index);
             }
 
             @Override
@@ -97,20 +122,9 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
                 md.deleteAction(index);
             }
         });
-    }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMap = map;
-        md = new MapController(this, mMap, mCurrentExercise.getActions(), false);
-        md.initMapDecorator();
-    }
+        if (md != null) md.updateMapControllersModel(mCurrentExercise.getActions());
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mDetailFragment != null)
-            mDetailFragment.updateAdapterDataset(mExerciseList.get(mCurrentExerciseIndex).getActions());
     }
 
     public int getCurrentExerciseIndex() {
