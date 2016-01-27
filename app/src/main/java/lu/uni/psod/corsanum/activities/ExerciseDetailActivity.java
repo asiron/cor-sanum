@@ -17,7 +17,7 @@ import lu.uni.psod.corsanum.fragments.ExerciseDetailHeaderFragment;
 import lu.uni.psod.corsanum.models.fit.Action;
 import lu.uni.psod.corsanum.models.fit.ActionType;
 import lu.uni.psod.corsanum.models.fit.Exercise;
-import lu.uni.psod.corsanum.utils.map.MapDecorator;
+import lu.uni.psod.corsanum.utils.map.MapController;
 import lu.uni.psod.corsanum.utils.ObservableList;
 
 public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCallback,
@@ -34,7 +34,7 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
 
     private GoogleMap mMap = null;
 
-    private MapDecorator md = null;
+    private MapController md = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +102,7 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        md = new MapDecorator(this, mMap, mCurrentExercise.getActions());
+        md = new MapController(this, mMap, mCurrentExercise.getActions(), false);
         md.initMapDecorator();
     }
 

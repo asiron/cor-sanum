@@ -11,7 +11,8 @@ import lu.uni.psod.corsanum.R;
 import lu.uni.psod.corsanum.fragments.ControlExerciseFragment;
 import lu.uni.psod.corsanum.models.fit.Exercise;
 
-import lu.uni.psod.corsanum.utils.map.MapDecorator;
+import lu.uni.psod.corsanum.utils.map.LocationSourceMock;
+import lu.uni.psod.corsanum.utils.map.MapController;
 
 public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback {
 
@@ -52,9 +53,21 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        MapDecorator md = new MapDecorator(this, mMap, mCurrentExercise.getActions());
-        md.initMapDecorator();
+        MapController mc = new MapController(this, mMap, mCurrentExercise.getActions(), true);
+        mc.initMapDecorator();
+        mc.setMock(new LocationSourceMock(mc, new LocationSourceMock.OnPartialRouteCompletedListener() {
+            @Override
+            public void onPartialRouteCompleted() {
 
+            }
+
+            @Override
+            public void onFullRouteCompleted() {
+
+            }
+        }));
+
+        mMap.setMyLocationEnabled(true);
     }
 
 
