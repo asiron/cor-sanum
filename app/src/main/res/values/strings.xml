@@ -30,5 +30,7 @@
     <string name="free_route_label">Free route</string>
     <string name="speed_front_label">Speed:</string>
     <string name="speed_back_label">km/h</string>
-
+    <string name="stretch_label_front">Stretch!</string>
+    <string name="exercise_done">Done!</string>
+    <string name="go_to_next_point">Go to next waypoint!</string>
 </resources>
