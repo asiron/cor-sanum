@@ -51,11 +51,8 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
     private Context mContext;
 
-    //private HashMap<Exercise, Integer> mExerciseList;
-
     private ObservableList<Exercise> mExerciseList;
 
-    //private ArrayList<Exercise> mExerciseList;
     private ArrayList<Exercise> mFilteredExerciseList;
 
     protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
@@ -63,12 +60,6 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
     public ExercisesRecyclerViewAdapter(Context context, ObservableList<Exercise> objects) {
         this.mContext = context;
         this.mExerciseList = objects;
-    /*
-        int i = 0;
-        for (Exercise e : objects) {
-            mExerciseList.put(e,i++);
-        }
-*/
         this.mFilteredExerciseList = new ArrayList<Exercise>(objects);
     }
 
@@ -80,10 +71,7 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder viewHolder, final int position) {
-        //final Exercise exercise = mFilteredExerciseList.get(position);
-        final Exercise exercise = mExerciseList.get(position);
-
-
+        final Exercise exercise = mFilteredExerciseList.get(position);
         viewHolder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         viewHolder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
@@ -128,9 +116,6 @@ public class ExercisesRecyclerViewAdapter extends RecyclerSwipeAdapter<Exercises
                 mItemManger.removeShownLayouts(viewHolder.swipeLayout);
 
                 removeItem(position);
-
-                //mExerciseList.remove(position);
-                //notifyItemRemoved(position);
 
                 notifyItemRangeChanged(position, mExerciseList.size());
                 mItemManger.closeAllItems();
