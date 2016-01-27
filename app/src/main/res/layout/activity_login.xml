@@ -4,26 +4,42 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorPrimary"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".LoginActivity">
 
-    <TextView android:text="Hello World!" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="create shared"
+        android:text="@string/create_shared_label"
         android:id="@+id/shared_btn"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true" />
+        android:layout_marginBottom="121dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MY EXERCISES"
-        android:id="@+id/exe"
-        android:layout_below="@+id/shared_btn"
-        android:layout_alignParentStart="true" />
+        android:text="@string/my_exercises_label"
+        android:id="@+id/my_exercises_btn"
+        android:layout_above="@+id/shared_btn"
+        android:layout_alignStart="@+id/shared_btn"
+        android:layout_alignEnd="@+id/shared_btn" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/treebig"
+        android:layout_above="@+id/free_route_btn"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/free_route_label"
+        android:id="@+id/free_route_btn"
+        android:layout_above="@+id/my_exercises_btn"
+        android:layout_alignEnd="@+id/my_exercises_btn"
+        android:layout_alignStart="@+id/my_exercises_btn" />
 
 </RelativeLayout>

@@ -103,7 +103,7 @@ public class LoginActivity extends Activity {
             authInProgress = savedInstanceState.getBoolean(AUTH_PENDING);
         }
 
-        exercises_button = (Button) findViewById(R.id.exe);
+        exercises_button = (Button) findViewById(R.id.my_exercises_btn);
         exercises_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

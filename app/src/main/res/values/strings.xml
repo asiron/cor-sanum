@@ -25,5 +25,8 @@
     <string name="cancel_create_new_exercise_label">Cancel</string>
     <string name="app_name_string">Cor Sanum</string>
     <string name="create_new_exercise_intent">createNewExerciseIntent</string>
+    <string name="create_shared_label">Return to factory settings</string>
+    <string name="my_exercises_label">My exercises</string>
+    <string name="free_route_label">Free route</string>
 
 </resources>
