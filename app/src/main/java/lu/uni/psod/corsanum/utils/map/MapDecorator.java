@@ -77,15 +77,6 @@ public class MapDecorator implements RoutingSucceededListener {
     }
 
     public void selectPartialRoute(int index) {
-        /*if (mCurrentSelectedRoute != -1 && mCurrentSelectedRoute < mDecoratorItemsOptions.size()-1 ) {
-            mDecoratorItemsOptions.get(mCurrentSelectedRoute).setRouteColor(mCtx.getResources().getColor(R.color.route_default));
-        }
-
-        mCurrentSelectedRoute = index;
-
-
-        mDecoratorItemsOptions.get(index).setRouteColor(mCtx.getResources().getColor(R.color.route_highlighted));
-        */
         int defaultColor = mCtx.getResources().getColor(R.color.route_default);
         for (MapDecoratorItem item : mDecoratorItemsOptions)
         {
