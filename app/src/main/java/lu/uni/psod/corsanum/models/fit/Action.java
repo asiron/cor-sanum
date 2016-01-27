@@ -76,4 +76,21 @@ public class Action {
         }
         return fullDesc;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Action action = (Action) o;
+
+        if (Double.compare(action.mExpectedDuration, mExpectedDuration) != 0) return false;
+        if (mStartPos != null ? !mStartPos.equals(action.mStartPos) : action.mStartPos != null)
+            return false;
+        if (mEndPos != null ? !mEndPos.equals(action.mEndPos) : action.mEndPos != null)
+            return false;
+        return mActionType == action.mActionType;
+
+    }
+
 }

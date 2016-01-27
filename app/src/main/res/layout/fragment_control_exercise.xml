@@ -74,9 +74,10 @@
             android:id="@+id/stretch_timer"
             android:textSize="40sp"
             android:layout_width="0dp"
+            android:paddingRight="20dp"
             android:layout_height="fill_parent"
             android:layout_gravity="right"
-            android:gravity="center|left"
+            android:gravity="center|right"
             android:layout_weight="1"
             />
     </LinearLayout>

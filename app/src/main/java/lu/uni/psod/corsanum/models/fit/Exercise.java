@@ -38,4 +38,23 @@ public class Exercise {
     public void setExerciseName(String name) {
         this.mExerciseName = name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Exercise exercise = (Exercise) o;
+
+        if (mExerciseName != null ? !mExerciseName.equals(exercise.mExerciseName) : exercise.mExerciseName != null)
+            return false;
+
+        for (int i=0; i<mActions.size(); ++i) {
+            if (!mActions.get(i).equals(exercise.getActions().get(i)))
+                return false;
+        }
+
+        return !(mActions != null ? !mActions.equals(exercise.mActions) : exercise.mActions != null);
+
+    }
 }

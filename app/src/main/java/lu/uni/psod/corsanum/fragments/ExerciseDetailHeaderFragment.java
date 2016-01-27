@@ -97,13 +97,6 @@ public class ExerciseDetailHeaderFragment extends Fragment {
                 Intent intent = new Intent(activity, ExerciseActivity.class);
                 intent.putExtra(activity.getString(R.string.current_exercise_idx), activity.getCurrentExerciseIndex());
 
-//                ActivityOptionsCompat options = ActivityOptionsCompat.
-//                        makeSceneTransitionAnimation(
-//                                activity,
-//                                (View) viewHolder.textViewData,
-//                                mContext.getString(R.string.exc_detail_tran_name)
-//                        );
-
                 activity.startActivity(intent);
 
             }

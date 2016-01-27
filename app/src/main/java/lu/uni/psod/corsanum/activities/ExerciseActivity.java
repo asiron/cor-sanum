@@ -10,6 +10,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import lu.uni.psod.corsanum.R;
@@ -19,6 +21,7 @@ import lu.uni.psod.corsanum.models.fit.ActionType;
 import lu.uni.psod.corsanum.models.fit.Exercise;
 
 import lu.uni.psod.corsanum.models.fit.Position;
+import lu.uni.psod.corsanum.utils.ObservableList;
 import lu.uni.psod.corsanum.utils.map.LocationSourceMock;
 import lu.uni.psod.corsanum.utils.map.MapController;
 import lu.uni.psod.corsanum.utils.map.MapUtils;
@@ -33,14 +36,14 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     }
 
     private final String TAG = "ExerciseActivity";
+    public static final String START_FREE_ROUTE = "StartFreeRoute";
+
 
     private MapFragment mMapFragment = null;
     private ControlExerciseFragment mControlExerciseFragment  = null;
 
     private GoogleMap mMap = null;
     private LocationSourceMock mLSM = null;
-
-    private HashMap<Integer, Marker> mMarkers;
 
     private int mCurrentExerciseIndex = 0;
     private Exercise mCurrentExercise = null;
@@ -54,6 +57,8 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     private boolean isTimerRunning    = false;
     private long timerTimeLeft = 0;
 
+    private boolean isFreeRoute = false;
+
     CountDownTimer mTimer = null;
 
     @Override
@@ -61,8 +66,7 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
-
-        mMarkers = new HashMap<Integer, Marker>();
+        isFreeRoute = getIntent().getBooleanExtra(START_FREE_ROUTE, false);
 
         mCurrentExerciseIndex = getIntent().getIntExtra(getString(R.string.current_exercise_idx), 0);
         mCurrentExercise = mExerciseList.get(mCurrentExerciseIndex);
@@ -80,7 +84,12 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        mMC = new MapController(this, mMap, mCurrentExercise.getActions(), true);
+
+        if (isFreeRoute)
+            mMC =  new MapController(this, mMap, new ObservableList<Action>(), true);
+        else
+            mMC = new MapController(this, mMap, mCurrentExercise.getActions(), true);
+
         mLSM = new LocationSourceMock(mMC, new LocationSourceMock.OnExerciseStageChangedListener() {
 
             boolean mockTimerRunning = false;
@@ -271,7 +280,7 @@ public class ExerciseActivity extends BaseActivity implements OnMapReadyCallback
                 long minutesLeft = (millisUntilFinished / 1000) / 60;
 
                 String time = String.format("%02d:%02d.%02d",
-                        minutesLeft, secondsLeft, millisUntilFinished/10);
+                        minutesLeft, secondsLeft, millisUntilFinished%100);
 
                 mControlExerciseFragment.updateActionTitleDisplay(
                         getResources().getString(R.string.stretch_label_front) + " " + time);

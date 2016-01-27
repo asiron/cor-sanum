@@ -25,7 +25,8 @@ import android.widget.ToggleButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.w3c.dom.Text;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lu.uni.psod.corsanum.activities.ExerciseActivity;
 import lu.uni.psod.corsanum.R;
@@ -44,7 +45,6 @@ public class ControlExerciseFragment extends Fragment {
         void onExerciseResume();
         void onExerciseStop();
         void onExercisePause();
-
     }
 
     private static final String TAG = "ControlExerciseFragment";
@@ -73,6 +73,11 @@ public class ControlExerciseFragment extends Fragment {
 
     private boolean isExerciseRunning = false;
 
+    private boolean isFreeRoute = false;
+    private Timer freeRouteTimer = null;
+    private long timeCounted = 0;
+
+
     public ControlExerciseFragment() {}
 
     @Override
@@ -93,9 +98,15 @@ public class ControlExerciseFragment extends Fragment {
         if (savedInstanceState != null)
             isExerciseRunning = savedInstanceState.getBoolean(IS_EXERCISE_RUNNING, false);
 
-        //boolean mFreeRoute = getArguments().getBoolean(FREE_RUN_INTENT, false);
-
         activity = (ExerciseActivity) getActivity();
+
+        Intent intent = activity.getIntent();
+        if (intent.hasExtra(ExerciseActivity.START_FREE_ROUTE)) {
+            isFreeRoute = true;
+        }
+
+        if (activity.getCurrentExercise().getActions().isEmpty())
+            isFreeRoute = true;
 
         stretchTimerTextView = (TextView) activity.findViewById(R.id.stretch_timer);
         stepCountTextView  = (TextView) activity.findViewById(R.id.step_count);
@@ -114,7 +125,6 @@ public class ControlExerciseFragment extends Fragment {
                     mMockEnabledCallbacks.onMockDisabled();
             }
         });
-
 
         exerciseTitleTextView = (TextView) activity.findViewById(R.id.exercise_title);
         exerciseTitleTextView.setText(activity.getCurrentExercise().getExerciseName());
@@ -137,10 +147,19 @@ public class ControlExerciseFragment extends Fragment {
         stopExerciseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mOnExerciseStateChangedListener.onExerciseStop();
+                if (!isFreeRoute) {
+                    mOnExerciseStateChangedListener.onExerciseStop();
+                } else {
+                    stopStopwatch();
+                }
                 stopExercise();
             }
         });
+
+        if (isFreeRoute) {
+            mockEnableSwitch.setVisibility(View.GONE);
+            exerciseTitleTextView.setText(activity.getString(R.string.free_route_label));
+        }
 
         LocalBroadcastManager
                 .getInstance(activity)
@@ -160,20 +179,35 @@ public class ControlExerciseFragment extends Fragment {
     private void startResumeExercise() {
         if (isExerciseRunning) {
             Log.i(TAG, "Resuming exercise.");
-            mOnExerciseStateChangedListener.onExerciseResume();
+            if (isFreeRoute) {
+                startStopwatch();
+            } else
+                mOnExerciseStateChangedListener.onExerciseResume();
 
         } else {
             Log.i(TAG, "Starting new exercise.");
-            mOnExerciseStateChangedListener.onExerciseStart();
+
+            if (isFreeRoute) {
+                startStopwatch();
+            } else
+                mOnExerciseStateChangedListener.onExerciseStart();
+
+
             startPauseExerciseButton.setTextOff(activity.getResources().getString(R.string.resume_exercise_label));
             stopExerciseButton.setVisibility(View.VISIBLE);
             isExerciseRunning = true;
             startGoogleFitService();
+
         }
     }
 
-    private void pauseExercise() {
-        mOnExerciseStateChangedListener.onExercisePause();
+    private void pauseExercise()
+    {
+        if (isFreeRoute) {
+            freeRouteTimer.cancel();
+        } else {
+            mOnExerciseStateChangedListener.onExercisePause();
+        }
     }
 
     public void stopExercise() {
@@ -349,5 +383,37 @@ public class ControlExerciseFragment extends Fragment {
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mFitSpeedDataReceiver);
 
         super.onDestroy();
+    }
+
+    private void stopStopwatch() {
+        freeRouteTimer.cancel();
+        timeCounted = 0;
+    }
+
+
+    private void startStopwatch() {
+        freeRouteTimer = new Timer();
+        freeRouteTimer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                timeCounted += 30;
+
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        long secondsLeft = (timeCounted / 1000) % 60;
+                        long minutesLeft = (timeCounted / 1000) / 60;
+
+                        String time = String.format("%02d:%02d.%02d",
+                                minutesLeft, secondsLeft, timeCounted % 100);
+                        stretchTimerTextView.setText(time);
+
+                    }
+                });
+
+            }
+        },0,30);
     }
 }

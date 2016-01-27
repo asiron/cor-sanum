@@ -34,4 +34,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.android.gms:play-services-maps:8.3.0'
     compile 'com.github.jd-alexander:library:1.0.7'
+    testCompile 'junit:junit:4.12'
+
 }

@@ -46,7 +46,6 @@ public class ExerciseDetailActivity extends BaseActivity implements OnMapReadyCa
         Intent intent = getIntent();
         String newExerciseIntentString = getString(R.string.create_new_exercise_intent);
 
-
         Fragment topFrag = null;
         mMapFragment = MapFragment.newInstance();
 
