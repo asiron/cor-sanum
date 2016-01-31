@@ -274,7 +274,7 @@ public class ControlExerciseFragment extends Fragment {
             if (intent.hasExtra(GoogleFitService.FIT_SPEED_DATA_EXTRA_SPEED)) {
                 final float speed = intent.getFloatExtra(GoogleFitService.FIT_SPEED_DATA_EXTRA_SPEED, 0);
                 speedTextView.setText(activity.getResources().getString(R.string.speed_front_label)
-                        + " " + String.format("%.2f", speed)
+                        + " " + String.format("%.1f", speed)
                         + " " + activity.getResources().getString(R.string.speed_back_label));
             }
         }
